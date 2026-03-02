@@ -1,0 +1,268 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AttendanceController;
+use Illuminate\Support\Facades\Route;
+use App\Models\Attendance;
+use App\Exports\AttendanceExport;
+use App\Exports\MonthlyAttendanceExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// 🔹 Redirect root ke dashboard
+Route::get('/', function () {
+    return redirect('/dashboard');
+});
+
+// 🔹 Dashboard
+Route::get('/dashboard', function () {
+    $today = now()->format('Y-m-d');
+
+    $attendanceToday = Attendance::where('user_id', auth()->id())
+        ->where('date', $today)
+        ->first();
+
+    $attendanceHistory = Attendance::where('user_id', auth()->id())
+        ->orderBy('date', 'desc')
+        ->take(7)
+        ->get();
+
+    // Rekap Bulanan
+    $currentMonth = now()->month;
+    $currentYear = now()->year;
+
+    $totalHadirBulanIni = Attendance::where('user_id', auth()->id())
+        ->whereMonth('date', $currentMonth)
+        ->whereYear('date', $currentYear)
+        ->whereNotNull('check_in')
+        ->count();
+
+    $totalBelumPulang = Attendance::where('user_id', auth()->id())
+        ->whereMonth('date', $currentMonth)
+        ->whereYear('date', $currentYear)
+        ->whereNotNull('check_in')
+        ->whereNull('check_out')
+        ->count();
+
+    return view('dashboard', [
+        'attendanceToday' => $attendanceToday,
+        'attendanceHistory' => $attendanceHistory,
+        'totalHadirBulanIni' => $totalHadirBulanIni,
+        'totalBelumPulang' => $totalBelumPulang,
+    ]);
+
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+
+// 🔹 Profile
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// 🔹 Absensi
+Route::middleware(['auth'])->group(function () {
+
+    Route::post('/check-in', [AttendanceController::class, 'checkIn'])
+        ->name('check.in');
+
+    Route::post('/check-out', [AttendanceController::class, 'checkOut'])
+        ->name('check.out');
+
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    // =======================
+// APPROVE / REJECT CHECKOUT
+// =======================
+
+    Route::post('/attendance/{id}/approve-checkout', [AttendanceController::class, 'approveCheckout'])
+    ->name('attendance.approve.checkout');
+
+    Route::post('/attendance/{id}/reject-checkout', [AttendanceController::class, 'rejectCheckout'])
+    ->name('attendance.reject.checkout');
+
+    Route::post('/attendance/{id}/approve', [AttendanceController::class, 'approve'])
+    ->name('attendance.approve');
+
+    Route::post('/attendance/{id}/reject', [AttendanceController::class, 'reject'])
+    ->name('attendance.reject');
+    Route::get('/admin/dashboard', function (\Illuminate\Http\Request $request) {
+
+        $query = \App\Models\Attendance::with('user');
+
+        if ($request->filled('date')) {
+            $query->where('date', $request->date);
+        }
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+    Route::get('/admin/users', function () {
+    $users = \App\Models\User::all();
+    return view('admin.users', compact('users'));
+})->name('admin.users');
+
+Route::post('/admin/users', function (\Illuminate\Http\Request $request) {
+
+    \App\Models\User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+        'role' => $request->role,
+    ]);
+
+    return back()->with('success', 'User berhasil ditambahkan');
+
+    Route::get('/admin/users', function () {
+    $users = \App\Models\User::all();
+    return view('admin.users', compact('users'));
+})->name('admin.users');
+
+Route::post('/admin/users', function (\Illuminate\Http\Request $request) {
+
+    \App\Models\User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+        'role' => $request->role,
+        'shift_start' => $request->shift_start,
+        'shift_end' => $request->shift_end,
+    ]);
+
+    return back()->with('success', 'User berhasil ditambahkan');
+})->name('admin.users.store');
+
+})->name('admin.users.store');
+
+        // ✅ Pagination (bukan get())
+        $attendances = $query->orderBy('date', 'desc')->paginate(10);
+
+        $users = User::all();
+
+        // Statistik
+        $totalUsers = User::count();
+        $totalAbsensi = \App\Models\Attendance::count();
+
+        $today = now()->format('Y-m-d');
+
+        $hadirHariIni = \App\Models\Attendance::where('date', $today)->count();
+
+        // ✅ Grafik Bulanan
+        $grafikRaw = \App\Models\Attendance::select(
+        DB::raw('MONTH(date) as bulan'),
+        DB::raw('COUNT(*) as total')
+    )
+    ->whereYear('date', now()->year)
+    ->groupBy('bulan')
+    ->pluck('total', 'bulan');
+
+    // Statistik bulan ini
+$currentMonth = now()->month;
+$currentYear = now()->year;
+
+$totalHadirBulanIni = Attendance::whereMonth('date', $currentMonth)
+    ->whereYear('date', $currentYear)
+    ->whereNotNull('check_in')
+    ->count();
+
+$totalTerlambatBulanIni = Attendance::whereMonth('date', $currentMonth)
+    ->whereYear('date', $currentYear)
+    ->whereTime('check_in', '>', '08:00:00')
+    ->count();
+
+$totalBelumPulangHariIni = Attendance::whereDate('date', now())
+    ->whereNull('check_out')
+    ->count();
+
+// Buat array 12 bulan default 0
+$grafikBulanan = [];
+
+for ($i = 1; $i <= 12; $i++) {
+    $grafikBulanan[$i] = $grafikRaw[$i] ?? 0;
+}
+
+// Ranking paling rajin (hadir terbanyak bulan ini)
+$rankingHadir = \App\Models\User::withCount(['attendances as total_hadir' => function ($query) {
+    $query->whereMonth('date', now()->month)
+          ->whereYear('date', now()->year)
+          ->whereNotNull('check_in');
+}])
+->orderByDesc('total_hadir')
+->take(5)
+->get();
+
+
+// Ranking paling sering terlambat
+$rankingTerlambat = \App\Models\User::withCount(['attendances as total_terlambat' => function ($query) {
+    $query->whereMonth('date', now()->month)
+          ->whereYear('date', now()->year)
+          ->whereTime('check_in', '>', '08:00:00');
+}])
+->orderByDesc('total_terlambat')
+->take(5)
+->get();
+
+$currentMonth = now()->month;
+$currentYear = now()->year;
+
+// Total hadir bulan ini
+$totalHadirBulanIni = \App\Models\Attendance::whereMonth('date', $currentMonth)
+    ->whereYear('date', $currentYear)
+    ->where('status', 'like', '%Hadir%')
+    ->count();
+
+// Total terlambat bulan ini
+$totalTerlambatBulanIni = \App\Models\Attendance::whereMonth('date', $currentMonth)
+    ->whereYear('date', $currentYear)
+    ->where('status', 'like', '%Terlambat%')
+    ->count();
+
+// Total pulang cepat
+$totalPulangCepat = \App\Models\Attendance::whereMonth('date', $currentMonth)
+    ->whereYear('date', $currentYear)
+    ->where('status', 'like', '%Pulang Cepat%')
+    ->count();
+
+return view('admin.dashboard', compact(
+    'attendances',
+    'users',
+    'totalUsers',
+    'totalAbsensi',
+    'hadirHariIni',
+    'grafikBulanan',
+    'totalHadirBulanIni',
+    'totalTerlambatBulanIni',
+    'totalBelumPulangHariIni',
+    'rankingHadir',
+    'rankingTerlambat',
+    'totalHadirBulanIni',
+    'totalTerlambatBulanIni',
+    'totalPulangCepat'
+));
+
+    })->name('admin.dashboard');
+
+
+    Route::get('/admin/export', function () {
+        return Excel::download(new AttendanceExport, 'absensi.xlsx');
+    })->name('admin.export');
+
+Route::get('/admin/export/{month}/{year}', function ($month, $year) {
+    return Excel::download(
+        new MonthlyAttendanceExport($month, $year),
+        "Laporan_Absensi_{$month}_{$year}.xlsx"
+    );
+})->name('admin.export.monthly');
+
+});
+
+require __DIR__.'/auth.php';
