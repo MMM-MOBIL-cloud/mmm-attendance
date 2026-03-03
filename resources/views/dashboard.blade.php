@@ -9,16 +9,26 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-    {{ __("You're logged in!") }}
+    <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">
+        Selamat Datang, {{ auth()->user()->name }} 👋
+    </h2>
+    <p class="text-gray-500 text-sm mt-1">
+        Sistem Absensi MMM MOBIL
+    </p>
+</div>
 
     {{-- 🔔 NOTIFIKASI REJECT --}}
     @if(auth()->user()->unreadNotifications->count() > 0)
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mt-4">
-            @foreach(auth()->user()->unreadNotifications as $notification)
-                <p>🔔 {{ $notification->data['message'] }}</p>
-            @endforeach
-        </div>
-    @endif
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mt-4">
+        @foreach(auth()->user()->unreadNotifications as $notification)
+            <p>🔔 {{ $notification->data['message'] }}</p>
+        @endforeach
+    </div>
+
+    {{-- Tandai semua notifikasi sebagai sudah dibaca --}}
+    {{ auth()->user()->unreadNotifications->markAsRead() }}
+@endif
                <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
