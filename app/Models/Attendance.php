@@ -6,40 +6,52 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
-   protected $fillable = [
-    'user_id',
-    'date',
-    'check_in',
-    'check_out',
-    'status',
-    'approval_status',
-    'checkout_approval_status',
-    'photo',
-    'latitude',
-    'longitude',
-];
-public function user()
-{
-    return $this->belongsTo(\App\Models\User::class);
-}
+    protected $fillable = [
+        'user_id',
+        'date',
+        'check_in',
+        'check_out',
+        'status',
+        'approval_status',
+        'checkout_approval_status',
+        'photo',
+        'latitude',
+        'longitude',
+    ];
 
-public function calculateDistance($lat, $lng)
-{
-    $officeLat = config('app.office_location.latitude');
-    $officeLng = config('app.office_location.longitude');
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 
-    $earthRadius = 6371000;
+    public function calculateDistance($lat, $lng)
+    {
+        $officeLat = config('app.office_location.latitude');
+        $officeLng = config('app.office_location.longitude');
 
-    $dLat = deg2rad($officeLat - $lat);
-    $dLng = deg2rad($officeLng - $lng);
+        $earthRadius = 6371000;
 
-    $a = sin($dLat/2) * sin($dLat/2) +
-         cos(deg2rad($lat)) *
-         cos(deg2rad($officeLat)) *
-         sin($dLng/2) * sin($dLng/2);
+        $dLat = deg2rad($officeLat - $lat);
+        $dLng = deg2rad($officeLng - $lng);
 
-    $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        $a = sin($dLat/2) * sin($dLat/2) +
+            cos(deg2rad($lat)) *
+            cos(deg2rad($officeLat)) *
+            sin($dLng/2) * sin($dLng/2);
 
-    return $earthRadius * $c;
-}
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+
+        return $earthRadius * $c;
+    }
+
+    public function getDistanceAttribute()
+    {
+        if (!$this->latitude || !$this->longitude) {
+            return null;
+        }
+
+        return round(
+            $this->calculateDistance($this->latitude, $this->longitude)
+        );
+    }
 }

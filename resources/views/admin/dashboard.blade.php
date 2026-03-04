@@ -4,6 +4,19 @@
 
     <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
 <div class="mb-4">
+    @if(session('success'))
+        <div style="color:green">
+            {{ session('success') }}
+        </div>
+    @endif
+    <form method="POST" action="{{ route('invite') }}">
+        @csrf
+
+        <input type="email" name="email" placeholder="Email karyawan" required>
+
+        <button type="submit">
+            Kirim Undangan
+        </button>
     <a href="{{ route('admin.export.monthly', [now()->month, now()->year]) }}"
        class="bg-green-600 text-white px-4 py-2 rounded">
         Export Bulan Ini

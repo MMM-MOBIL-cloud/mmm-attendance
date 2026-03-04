@@ -9,6 +9,7 @@ use App\Exports\MonthlyAttendanceExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\InvitationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -300,5 +301,8 @@ Route::get('/admin/export/{month}/{year}', function ($month, $year) {
 })->name('admin.export.monthly');
 
 });
+Route::post('/invite', [InvitationController::class, 'invite'])->name('invite');
 
+Route::get('/invite-register/{token}', [InvitationController::class, 'showRegister']);
+Route::post('/invite-register/{token}', [InvitationController::class, 'processRegister']);
 require __DIR__.'/auth.php';

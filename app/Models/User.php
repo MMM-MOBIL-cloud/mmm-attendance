@@ -24,6 +24,8 @@ class User extends Authenticatable
     'role',
     'shift_start',
     'shift_end',
+    'invitation_token',
+    'is_active'
 ];
 
     /**
