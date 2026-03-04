@@ -44,6 +44,39 @@ Route::get('/dashboard', function () {
         ->whereNotNull('check_in')
         ->count();
 
+    $totalTerlambatBulanIni = Attendance::where('user_id', auth()->id())
+        ->whereMonth('date', $currentMonth)
+        ->whereYear('date', $currentYear)
+        ->where('status', 'Terlambat')
+        ->count();
+
+    // ======================
+// HITUNG TOTAL MENIT TERLAMBAT BULAN INI
+// ======================
+
+$batasMasuk = \Carbon\Carbon::createFromTime(8, 15, 0);
+
+$totalMenitTerlambat = 0;
+
+$absensiTerlambat = Attendance::where('user_id', auth()->id())
+    ->whereMonth('date', $currentMonth)
+    ->whereYear('date', $currentYear)
+    ->where('status', 'Terlambat')
+    ->get();
+
+foreach ($absensiTerlambat as $absen) {
+    $jamMasuk = \Carbon\Carbon::parse($absen->check_in);
+    $selisih = $batasMasuk->diffInMinutes($jamMasuk, false);
+
+    if ($selisih > 0) {
+        $totalMenitTerlambat += $selisih;
+    }
+}
+
+// Konversi ke jam & menit
+$totalJamTerlambat = floor($totalMenitTerlambat / 60);
+$sisaMenitTerlambat = $totalMenitTerlambat % 60;
+
     $totalBelumPulang = Attendance::where('user_id', auth()->id())
         ->whereMonth('date', $currentMonth)
         ->whereYear('date', $currentYear)
@@ -55,6 +88,9 @@ Route::get('/dashboard', function () {
         'attendanceToday' => $attendanceToday,
         'attendanceHistory' => $attendanceHistory,
         'totalHadirBulanIni' => $totalHadirBulanIni,
+        'totalTerlambatBulanIni' => $totalTerlambatBulanIni,
+        'totalJamTerlambat' => $totalJamTerlambat,
+        'sisaMenitTerlambat' => $sisaMenitTerlambat,
         'totalBelumPulang' => $totalBelumPulang,
     ]);
 

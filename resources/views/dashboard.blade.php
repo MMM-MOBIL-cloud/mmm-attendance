@@ -39,6 +39,13 @@
                     <p class="text-3xl font-bold text-blue-600 mt-2">
                         {{ \Carbon\Carbon::now()->format('d M Y') }}
                     </p>
+                    @if($attendanceToday && $attendanceToday->status)
+    <p class="mt-2 text-sm font-semibold
+        {{ $attendanceToday->status == 'Terlambat' ? 'text-red-600' : 'text-green-600' }}">
+
+        {{ $attendanceToday->status == 'Terlambat' ? '🔴 Terlambat' : '🟢 Hadir' }}
+    </p>
+@endif
                 </div>
 
                 <div class="bg-white shadow-lg rounded-2xl p-6">
@@ -54,21 +61,30 @@
                         {{ $attendanceToday->check_out ?? '-' }}
                     </p>
                 </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-
     <div class="bg-white shadow-md rounded-lg p-6">
         <h3 class="text-gray-500 text-sm">Total Hadir Bulan Ini</h3>
         <p class="text-3xl font-bold text-blue-600 mt-2">
             {{ $totalHadirBulanIni }} Hari
         </p>
     </div>
-
     <div class="bg-white shadow-md rounded-lg p-6">
         <h3 class="text-gray-500 text-sm">Belum Absen Pulang</h3>
         <p class="text-3xl font-bold text-red-600 mt-2">
             {{ $totalBelumPulang }} Hari
         </p>
     </div>
+    <div class="bg-white shadow-md rounded-lg p-6">
+    <h3 class="text-gray-500 text-sm">Total Terlambat Bulan Ini</h3>
+    <p class="text-3xl font-bold text-red-600 mt-2">
+        {{ $totalTerlambatBulanIni }} Hari
+    </p>
+</div>
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h3 class="text-gray-500 text-sm">Total Jam Terlambat Bulan Ini</h3>
+    <p class="text-2xl font-bold text-orange-600 mt-2">
+        {{ $totalJamTerlambat }} Jam {{ $sisaMenitTerlambat }} Menit
+    </p>
+</div>
 </div>
 
 </div>

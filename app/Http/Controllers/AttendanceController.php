@@ -63,6 +63,15 @@ public function rejectCheckout($id)
     $now = now();
 
     // ======================
+// BATAS MULAI CHECK-IN 07:45
+// ======================
+$batasMulai = now()->setTime(7, 45, 0);
+
+if ($now->lt($batasMulai)) {
+    return back()->with('error', 'Check-in hanya bisa mulai jam 07:45.');
+}
+
+    // ======================
     // WAJIB SELFIE
     // ======================
     if (!$request->photo) {
@@ -129,22 +138,20 @@ if ($existing && $existing->approval_status == 'Rejected') {
     $distance = $earthRadius * $c;
 
     // ======================
-    // STATUS LOGIC
-    // ======================
-    $batasMasuk = now()->setTime(8, 0, 0);
+// STATUS LOGIC (FINAL)
+// ======================
+$batasMasuk = now()->setTime(8, 15, 0);
 
-    if ($distance > $radius) {
-    $status = 'Di Luar Radius';
+// Tentukan status keterlambatan dulu
+$status = $now->gt($batasMasuk) ? 'Terlambat' : 'Hadir';
+
+// Tentukan approval berdasarkan radius
+if ($distance > $radius) {
     $approvalStatus = 'Pending';
 } else {
     $approvalStatus = 'Approved';
-
-    if ($now->gt($batasMasuk)) {
-        $status = 'Terlambat';
-    } else {
-        $status = 'Hadir';
-    }
 }
+
 
     // ======================
     // SIMPAN DATA
@@ -167,6 +174,15 @@ if ($existing && $existing->approval_status == 'Rejected') {
 {
     $today = now()->format('Y-m-d');
     $now = now();
+
+    // ======================
+// BATAS AKHIR CHECK-OUT 17:00
+// ======================
+$batasAkhirCheckout = now()->setTime(17, 0, 0);
+
+if ($now->gt($batasAkhirCheckout)) {
+    return back()->with('error', 'Check-out maksimal sampai jam 17:00.');
+}
 
     $attendance = Attendance::where('user_id', auth()->id())
         ->where('date', $today)
@@ -205,8 +221,17 @@ if ($distance > $radius) {
     $checkoutApproval = 'Approved';
 }
 
+// ======================
+    // JAM KERJA DIHITUNG MAKSIMAL 16:00
+    // ======================
+    $batasHitungPulang = now()->setTime(16, 0, 0);
+
+    $jamPulangFinal = $now->gt($batasHitungPulang)
+        ? $batasHitungPulang
+        : $now;
+
     $attendance->update([
-        'check_out' => $now->format('H:i:s'),
+        'check_out' => $jamPulangFinal->format('H:i:s'),
         'checkout_approval_status' => $checkoutApproval
     ]);
 
