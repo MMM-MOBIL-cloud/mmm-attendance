@@ -26,5 +26,32 @@ Tambah User
 
 </form>
 
+<h2 class="text-xl font-bold mt-8 mb-4">Daftar User</h2>
+
+<table class="min-w-full bg-white shadow rounded">
+
+<thead>
+<tr class="bg-gray-100">
+<th class="p-2">Nama</th>
+<th class="p-2">Email</th>
+<th class="p-2">Role</th>
+</tr>
+</thead>
+
+<tbody>
+
+@foreach($users as $user)
+
+<tr class="border-t">
+<td class="p-2">{{ $user->name }}</td>
+<td class="p-2">{{ $user->email }}</td>
+<td class="p-2">{{ $user->role }}</td>
+</tr>
+
+@endforeach
+
+</tbody>
+
+</table>
 </div>
 </x-app-layout>

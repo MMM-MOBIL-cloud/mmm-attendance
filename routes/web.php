@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Attendance;
 use App\Exports\AttendanceExport;
@@ -305,4 +306,11 @@ Route::post('/invite', [InvitationController::class, 'invite'])->name('invite');
 
 Route::get('/invite-register/{token}', [InvitationController::class, 'showRegister']);
 Route::post('/invite-register/{token}', [InvitationController::class, 'processRegister']);
+
+Route::get('/admin/users', [App\Http\Controllers\AdminController::class, 'users'])->name('admin.users');
+
+Route::post('/admin/users/store', [AdminController::class, 'storeUser'])->name('admin.users.store');
+
+Route::get('/admin/attendance-today', [App\Http\Controllers\AdminController::class, 'attendanceToday'])->name('admin.today');
+
 require __DIR__.'/auth.php';

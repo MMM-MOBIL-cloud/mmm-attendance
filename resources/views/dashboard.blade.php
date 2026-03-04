@@ -90,7 +90,8 @@
 </div>
 <div class="p-6 text-gray-900">
 
-    <form method="POST" action="{{ route('check.in') }}">
+    @if(!$attendanceToday || $attendanceToday->approval_status == 'Rejected')
+<form method="POST" action="{{ route('check.in') }}">
     @csrf
 
     <input type="hidden" name="latitude" id="latitude">
@@ -104,31 +105,65 @@
     @endif
 
     <div class="mb-4">
-        <video id="video" width="300" autoplay></video>
-        <canvas id="canvas" style="display:none;"></canvas>
 
-        <button type="button" onclick="takePhoto()">
-            Ambil Foto
-        </button>
-    </div>
-
-    <button type="submit"
-    class="bg-blue-600 text-white px-4 py-2 rounded"
-    {{
-        $attendanceToday
-        && $attendanceToday->check_in
-        && $attendanceToday->approval_status != 'Rejected'
-        ? 'disabled'
-        : ''
-    }}>
+<button type="button"
+    onclick="showCameraSection()"
+    class="bg-blue-600 text-white px-4 py-2 rounded">
     Absen Masuk
 </button>
+
+<div id="cameraSection" style="display:none; margin-top:20px">
+
+    <button type="button"
+        onclick="startCamera()"
+        class="bg-gray-700 text-white px-4 py-2 rounded">
+        Aktifkan Kamera
+    </button>
+
+    <br><br>
+
+    <video id="video" width="300" autoplay playsinline
+    style="display:none;border-radius:10px"></video>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <img id="previewImage" style="display:none; width:300px; border-radius:10px; margin-top:10px;">
+
+    <br><br>
+
+    <button type="button"
+        onclick="takePhoto()"
+        id="captureBtn"
+        class="bg-green-600 text-white px-4 py-2 rounded"
+        style="display:none">
+        Ambil Foto
+    </button>
+
+    <button type="button"
+    onclick="retakePhoto()"
+    id="retakeBtn"
+    class="bg-yellow-500 text-white px-4 py-2 rounded"
+    style="display:none">
+    Ambil Ulang
+</button>
+
+    <br><br>
+
+    <button type="submit"
+        class="bg-blue-600 text-white px-4 py-2 rounded">
+        Kirim Absen
+    </button>
+
+</div>
 </form>
 
 @if(session('success'))
     <div class="mt-2 text-green-600">
         {{ session('success') }}
     </div>
+@endif
+
+</form>
 @endif
 
 <form method="POST" action="{{ route('check.out') }}" class="mt-2">
@@ -182,37 +217,84 @@
         </div>
     </div>
     <script>
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const photoInput = document.getElementById('photoInput');
 
-// Aktifkan Kamera
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-        video.srcObject = stream;
+let stream;
+
+function showCameraSection(){
+    document.getElementById("cameraSection").style.display = "block";
+}
+
+function startCamera(){
+
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" }
     })
-    .catch(err => {
+    .then(function(s){
+
+        stream = s;
+
+        const video = document.getElementById('video');
+        const captureBtn = document.getElementById('captureBtn');
+
+        video.srcObject = stream;
+
+        video.style.display = 'block';
+        captureBtn.style.display = 'inline-block';
+
+    })
+    .catch(function(){
+
         alert("Kamera tidak bisa diakses");
+
     });
 
-// Ambil Foto
-function takePhoto() {
-    const context = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+}
 
-    context.drawImage(video, 0, 0);
+function takePhoto(){
 
-    const imageData = canvas.toDataURL('image/png');
-    photoInput.value = imageData;
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const preview = document.getElementById('previewImage');
+const photoInput = document.getElementById('photoInput');
 
-    alert("Foto berhasil diambil");
+const context = canvas.getContext('2d');
+
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+
+context.drawImage(video,0,0);
+
+const imageData = canvas.toDataURL('image/png');
+
+photoInput.value = imageData;
+
+preview.src = imageData;
+preview.style.display = "block";
+
+video.style.display = "none";
+
+document.getElementById("captureBtn").style.display = "none";
+document.getElementById("retakeBtn").style.display = "inline-block";
+
+}
+
+function retakePhoto(){
+
+const video = document.getElementById('video');
+const preview = document.getElementById('previewImage');
+
+preview.style.display = "none";
+
+video.style.display = "block";
+
+document.getElementById("captureBtn").style.display = "inline-block";
+document.getElementById("retakeBtn").style.display = "none";
+
 }
 
 // Ambil Lokasi GPS
 navigator.geolocation.getCurrentPosition(function(position) {
 
-    // Untuk Check-In
     const latIn = document.getElementById('latitude');
     const lngIn = document.getElementById('longitude');
 
@@ -221,7 +303,6 @@ navigator.geolocation.getCurrentPosition(function(position) {
         lngIn.value = position.coords.longitude;
     }
 
-    // Untuk Check-Out
     const latOut = document.getElementById('latitudeOut');
     const lngOut = document.getElementById('longitudeOut');
 
@@ -231,5 +312,6 @@ navigator.geolocation.getCurrentPosition(function(position) {
     }
 
 });
+
 </script>
 </x-app-layout>

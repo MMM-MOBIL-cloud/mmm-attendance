@@ -21,23 +21,32 @@
        class="bg-green-600 text-white px-4 py-2 rounded">
         Export Bulan Ini
     </a>
+    </form>
 </div>
     {{-- Statistik --}}
     <div class="grid grid-cols-3 gap-6 mb-8">
-        <div class="bg-blue-600 text-white p-6 rounded-xl shadow">
-            <h2 class="text-lg">Total Users</h2>
-            <p class="text-3xl font-bold">{{ $totalUsers }}</p>
-        </div>
+        <a href="{{ route('admin.users') }}">
+
+<div class="bg-blue-600 text-white p-6 rounded-xl shadow hover:scale-105 transition cursor-pointer">
+    <h2 class="text-lg">Total Users</h2>
+    <p class="text-3xl font-bold">{{ $totalUsers }}</p>
+</div>
+
+</a>
 
         <div class="bg-green-600 text-white p-6 rounded-xl shadow">
             <h2 class="text-lg">Total Absensi</h2>
             <p class="text-3xl font-bold">{{ $totalAbsensi }}</p>
         </div>
 
-        <div class="bg-purple-600 text-white p-6 rounded-xl shadow">
-            <h2 class="text-lg">Hadir Hari Ini</h2>
-            <p class="text-3xl font-bold">{{ $hadirHariIni }}</p>
-        </div>
+        <a href="{{ route('admin.today') }}">
+
+<div class="bg-purple-600 text-white p-6 rounded-xl shadow hover:scale-105 transition cursor-pointer">
+    <h2 class="text-lg">Hadir Hari Ini</h2>
+    <p class="text-3xl font-bold">{{ $hadirHariIni }}</p>
+</div>
+
+</a>
  </div>
  <div class="grid grid-cols-3 gap-6 mt-6">
 
