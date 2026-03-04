@@ -294,6 +294,19 @@ return view('admin.dashboard', compact(
         return Excel::download(new AttendanceExport, 'absensi.xlsx');
     })->name('admin.export');
 
+    Route::get('/admin/export-user', function () {
+
+    return Excel::download(
+        new AttendanceExport(
+            request('user_id'),
+            request('month'),
+            request('year')
+        ),
+        'laporan-absensi-user.xlsx'
+    );
+
+})->name('admin.export.user');
+
 Route::get('/admin/export/{month}/{year}', function ($month, $year) {
     return Excel::download(
         new MonthlyAttendanceExport($month, $year),

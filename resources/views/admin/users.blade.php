@@ -25,7 +25,45 @@ Tambah User
 </button>
 
 </form>
+<form action="{{ route('admin.export.user') }}" method="GET" class="bg-white p-4 rounded shadow mb-6 flex gap-3 items-center">
 
+<select name="user_id" class="border p-2 rounded" required>
+<option value="">Pilih User</option>
+
+@foreach($users as $user)
+<option value="{{ $user->id }}">
+{{ $user->name }}
+</option>
+@endforeach
+
+</select>
+
+<select name="month" class="border p-2 rounded" required>
+<option value="">Pilih Bulan</option>
+<option value="1">Januari</option>
+<option value="2">Februari</option>
+<option value="3">Maret</option>
+<option value="4">April</option>
+<option value="5">Mei</option>
+<option value="6">Juni</option>
+<option value="7">Juli</option>
+<option value="8">Agustus</option>
+<option value="9">September</option>
+<option value="10">Oktober</option>
+<option value="11">November</option>
+<option value="12">Desember</option>
+</select>
+
+<select name="year" class="border p-2 rounded">
+<option value="{{ now()->year }}">{{ now()->year }}</option>
+<option value="{{ now()->year - 1 }}">{{ now()->year - 1 }}</option>
+</select>
+
+<button class="bg-green-600 text-white px-4 py-2 rounded">
+Export Absensi
+</button>
+
+</form>
 <h2 class="text-xl font-bold mt-8 mb-4">Daftar User</h2>
 
 <table class="min-w-full bg-white shadow rounded">
