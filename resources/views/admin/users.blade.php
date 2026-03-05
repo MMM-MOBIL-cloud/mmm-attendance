@@ -7,18 +7,80 @@
 @csrf
 
 <div class="grid grid-cols-2 gap-4">
-    <input type="text" name="name" placeholder="Nama" class="border p-2 rounded" required>
-    <input type="email" name="email" placeholder="Email" class="border p-2 rounded" required>
-    <input type="password" name="password" placeholder="Password" class="border p-2 rounded" required>
 
-    <select name="role" class="border p-2 rounded">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-    </select>
-
-    <input type="time" name="shift_start" class="border p-2 rounded">
-    <input type="time" name="shift_end" class="border p-2 rounded">
+<div>
+<label class="text-sm text-gray-600">Nama</label>
+<input type="text" name="name" placeholder="Nama"
+class="border p-2 rounded w-full" required>
 </div>
+
+<div>
+<label class="text-sm text-gray-600">Email</label>
+<input type="email" name="email" placeholder="Email"
+class="border p-2 rounded w-full" required>
+</div>
+
+<div>
+<label class="text-sm text-gray-600">Password</label>
+<input type="password" name="password" placeholder="Password"
+class="border p-2 rounded w-full" required>
+</div>
+
+<div>
+<label class="text-sm text-gray-600">Role</label>
+<select name="role" class="border p-2 rounded w-full">
+<option value="user">User</option>
+<option value="admin">Admin</option>
+</select>
+</div>
+
+<div>
+<label class="text-sm text-gray-600">Jabatan</label>
+<select name="position" class="border p-2 rounded w-full">
+<option value="">Pilih Jabatan</option>
+<option value="Sales">Sales</option>
+<option value="Admin Office">Admin Office</option>
+<option value="Supervisor">Supervisor</option>
+<option value="Manager">Manager</option>
+<option value="Marketing">Marketing</option>
+<option value="Host Live">Host Live</option>
+<option value="Konten Kreator">Konten Kreator</option>
+<option value="Editor Konten">Editor Konten</option>
+<option value="Videographer/Photographer">Videographer/Photographer</option>
+<option value="Office Boy / Cleaning Service">Office Boy / Cleaning Service</option>
+<option value="Other">Other</option>
+</select>
+</div>
+
+<div>
+<label class="text-sm text-gray-600">Jam Masuk</label>
+<input type="time" name="shift_start"
+class="border p-2 rounded w-full">
+</div>
+
+<div>
+<label class="text-sm text-gray-600">Jam Pulang</label>
+<input type="time" name="shift_end"
+class="border p-2 rounded w-full">
+</div>
+
+</div>
+    <div class="col-span-2 mt-2">
+<label class="font-semibold">Jadwal Hari Kerja</label>
+
+<div class="grid grid-cols-4 gap-2 mt-2 text-sm">
+
+<label><input type="checkbox" name="work_days[]" value="Monday"> Senin</label>
+<label><input type="checkbox" name="work_days[]" value="Tuesday"> Selasa</label>
+<label><input type="checkbox" name="work_days[]" value="Wednesday"> Rabu</label>
+<label><input type="checkbox" name="work_days[]" value="Thursday"> Kamis</label>
+<label><input type="checkbox" name="work_days[]" value="Friday"> Jumat</label>
+<label><input type="checkbox" name="work_days[]" value="Saturday"> Sabtu</label>
+<label><input type="checkbox" name="work_days[]" value="Sunday"> Minggu</label>
+
+</div>
+</div>
+
 
 <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
 Tambah User
@@ -73,6 +135,8 @@ Export Absensi
 <th class="p-2">Nama</th>
 <th class="p-2">Email</th>
 <th class="p-2">Role</th>
+<th class="p-2">Jabatan</th>
+<th class="p-2">Action</th>
 </tr>
 </thead>
 
@@ -84,6 +148,22 @@ Export Absensi
 <td class="p-2">{{ $user->name }}</td>
 <td class="p-2">{{ $user->email }}</td>
 <td class="p-2">{{ $user->role }}</td>
+<td class="p-2">
+
+{{ $user->position ?? '-' }}
+
+<a href="{{ route('admin.user.edit', $user->id) }}"
+class="ml-2 text-gray-600 hover:text-blue-600">
+⚙️
+</a>
+
+</td>
+<td class="p-2">
+<a href="{{ route('admin.user.schedule', $user->id) }}"
+   class="bg-yellow-500 text-white px-3 py-1 rounded">
+   Atur Jadwal
+</a>
+</td>
 </tr>
 
 @endforeach

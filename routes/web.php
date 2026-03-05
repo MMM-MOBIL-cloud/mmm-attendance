@@ -322,8 +322,23 @@ Route::post('/invite-register/{token}', [InvitationController::class, 'processRe
 
 Route::get('/admin/users', [App\Http\Controllers\AdminController::class, 'users'])->name('admin.users');
 
+Route::get('/admin/users/{id}/schedule', [AdminController::class, 'userSchedule'])
+    ->name('admin.user.schedule');
+
+Route::post('/admin/users/{id}/schedule', [AdminController::class, 'saveUserSchedule'])
+    ->name('admin.user.schedule.save');
+
 Route::post('/admin/users/store', [AdminController::class, 'storeUser'])->name('admin.users.store');
 
 Route::get('/admin/attendance-today', [App\Http\Controllers\AdminController::class, 'attendanceToday'])->name('admin.today');
+
+Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])
+    ->name('admin.user.edit');
+
+Route::post('/admin/users/{id}/update', [AdminController::class, 'updateUser'])
+    ->name('admin.user.update');
+
+Route::delete('/admin/users/{id}/delete', [AdminController::class, 'deleteUser'])
+    ->name('admin.user.delete');
 
 require __DIR__.'/auth.php';

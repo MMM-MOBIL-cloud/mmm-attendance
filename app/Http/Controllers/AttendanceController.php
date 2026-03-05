@@ -62,6 +62,17 @@ public function rejectCheckout($id)
     $today = now()->format('Y-m-d');
     $now = now();
 
+    $todayName = now()->format('l');
+
+$workDays = \DB::table('user_work_days')
+    ->where('user_id', auth()->id())
+    ->pluck('day')
+    ->toArray();
+
+if (!in_array($todayName, $workDays)) {
+    return back()->with('error', 'Hari ini bukan jadwal kerja anda.');
+}
+
     // ======================
 // BATAS MULAI CHECK-IN 07:45
 // ======================

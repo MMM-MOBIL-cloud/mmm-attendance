@@ -147,7 +147,10 @@
 
     {{-- Tabel --}}
 <div class="bg-white p-6 rounded-xl shadow">
-<table class="w-full text-center border-collapse">
+
+<div class="overflow-x-auto">
+<table class="min-w-[1200px] text-center border-collapse">
+
 
     <thead class="bg-gray-100">
         <tr>
@@ -361,6 +364,8 @@
 
 <div class="mt-4">
     {{ $attendances->links() }}
+</div>
+
 </div>
 </div>
 

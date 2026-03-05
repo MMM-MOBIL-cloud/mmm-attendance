@@ -22,6 +22,7 @@ class User extends Authenticatable
     'email',
     'password',
     'role',
+    'position',
     'shift_start',
     'shift_end',
     'invitation_token',

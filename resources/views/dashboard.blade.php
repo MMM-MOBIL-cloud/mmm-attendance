@@ -13,6 +13,18 @@
     <h2 class="text-2xl font-bold text-gray-800">
         Selamat Datang, {{ auth()->user()->name }} 👋
     </h2>
+
+@if(session('error'))
+<div class="bg-red-500 text-white px-4 py-3 rounded mt-4">
+    {{ session('error') }}
+</div>
+@endif
+
+@if(session('success'))
+<div class="bg-green-500 text-white px-4 py-3 rounded mt-4">
+    {{ session('success') }}
+</div>
+@endif
     <p class="text-gray-500 text-sm mt-1">
         Sistem Absensi MMM MOBIL
     </p>
@@ -90,19 +102,30 @@
 </div>
 <div class="p-6 text-gray-900">
 
-    @if(!$attendanceToday || $attendanceToday->approval_status == 'Rejected')
+    @php
+$todayName = now()->format('l');
+
+$workDays = DB::table('user_work_days')
+    ->where('user_id', auth()->id())
+    ->pluck('day')
+    ->toArray();
+
+$isWorkDay = in_array($todayName, $workDays);
+@endphp
+
+@if(!$isWorkDay)
+<div style="background:#FEF3C7; border:1px solid #F59E0B; color:#92400E; padding:10px; border-radius:8px; margin-bottom:15px;">
+⚠️ Hari ini bukan jadwal kerja anda.
+</div>
+@endif
+
+    @if($isWorkDay && (!$attendanceToday || $attendanceToday->approval_status == 'Rejected'))
 <form method="POST" action="{{ route('check.in') }}">
     @csrf
 
     <input type="hidden" name="latitude" id="latitude">
     <input type="hidden" name="longitude" id="longitude">
     <input type="hidden" name="photo" id="photoInput">
-
-    @if(session('error'))
-        <div class="mt-2 text-red-600">
-            {{ session('error') }}
-        </div>
-    @endif
 
     <div class="mb-4">
 
@@ -166,6 +189,7 @@
 </form>
 @endif
 
+@if($isWorkDay)
 <form method="POST" action="{{ route('check.out') }}" class="mt-2">
     @csrf
     <input type="hidden" name="latitude" id="latitudeOut">
@@ -177,6 +201,7 @@
         Absen Pulang
     </button>
 </form>
+@endif
 </div><div class="mt-10">
     <h2 class="text-xl font-semibold mb-4">Riwayat Absensi</h2>
 
