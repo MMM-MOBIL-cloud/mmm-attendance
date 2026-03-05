@@ -13,14 +13,14 @@ class AutoCheckout extends Command
      *
      * @var string
      */
-    protected $signature = 'app:auto-checkout';
+    protected $signature = 'attendance:auto-checkout';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Auto checkout jika user lupa absen pulang';
 
     /**
      * Execute the console command.
@@ -30,13 +30,17 @@ class AutoCheckout extends Command
     $today = Carbon::today()->toDateString();
 
     $attendances = Attendance::whereDate('date', $today)
+        ->whereNotNull('check_in')
         ->whereNull('check_out')
         ->get();
 
     foreach ($attendances as $attendance) {
 
-        $attendance->check_out = '16:00:00';
-        $attendance->checkout_approval_status = 'Approved';
+        $attendance->check_out = Carbon::parse($today.' 16:00:00');
+
+$attendance->checkout_type = 'auto';
+
+$attendance->checkout_approval_status = 'Pending';
 
         $attendance->save();
     }

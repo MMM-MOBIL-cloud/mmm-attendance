@@ -189,11 +189,39 @@ if ($distance > $radius) {
     // ======================
 // BATAS AKHIR CHECK-OUT 17:00
 // ======================
-$batasAkhirCheckout = now()->setTime(17, 0, 0);
+$batasAkhirCheckout = now()->setTime(21, 0, 0);
 
 if ($now->gt($batasAkhirCheckout)) {
-    return back()->with('error', 'Check-out maksimal sampai jam 17:00.');
+    return back()->with('error', 'Check-out maksimal sampai jam 21:00.');
 }
+
+$now = now();
+$today = $now->toDateString();
+
+$attendance = Attendance::where('user_id', auth()->id())
+    ->whereDate('date', $today)
+    ->first();
+
+if (!$attendance) {
+    return back()->with('error','Data absensi tidak ditemukan');
+}
+
+$checkoutTime = $now;
+
+if ($now->format('H:i') >= '16:00' && $now->format('H:i') <= '21:00') {
+
+    // tetap dihitung jam 16:00
+    $checkoutTime = Carbon::parse($today.' 16:00:00');
+
+}
+
+$attendance->check_out = $checkoutTime;
+
+$attendance->checkout_type = 'manual';
+
+$attendance->checkout_approval_status = 'Approved';
+
+$attendance->save();
 
     $attendance = Attendance::where('user_id', auth()->id())
         ->where('date', $today)

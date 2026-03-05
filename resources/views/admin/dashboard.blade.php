@@ -159,6 +159,7 @@
             <th class="p-3">Tanggal</th>
             <th class="p-3">Check In</th>
             <th class="p-3">Check Out</th>
+            <th class="p-3">Checkout Type</th>
             <th class="p-3">Status</th>
             <th class="p-3">Jam Kerja</th>
             <th class="p-3">Jarak</th>
@@ -203,6 +204,31 @@
         <td class="p-3">
             {{ $attendance->check_out ?? '-' }}
         </td>
+
+        {{-- CHECKOUT TYPE --}}
+       <td class="p-3">
+
+@php
+$type = strtolower(trim($attendance->checkout_type ?? ''));
+@endphp
+
+@if($type == 'auto')
+
+<span style="background:#f97316;color:white;padding:3px 10px;border-radius:9999px;font-size:12px;">
+AUTO
+</span>
+
+@elseif($type == 'manual')
+
+<span style="background:#3b82f6;color:white;padding:3px 10px;border-radius:9999px;font-size:12px;">
+MANUAL
+</span>
+
+@else
+-
+@endif
+
+</td>
 
         {{-- STATUS --}}
         <td class="p-3">
