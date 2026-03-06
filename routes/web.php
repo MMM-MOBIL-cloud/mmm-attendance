@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\ScheduleSwapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +115,30 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/check-out', [AttendanceController::class, 'checkOut'])
         ->name('check.out');
+
+    Route::get('/swap-schedule',
+        [ScheduleSwapController::class, 'index'])
+        ->name('swap.index');
+
+    Route::get('/swap-schedule/create',
+[   ScheduleSwapController::class,'create'])
+        ->name('swap.create');
+
+    Route::post('/swap-schedule/store',
+    [ScheduleSwapController::class,'store'])
+        ->name('swap.store');
+
+    Route::get('/swap-approval',
+    [App\Http\Controllers\SwapApprovalController::class,'index'])
+    ->name('swap.approval.index');
+
+    Route::post('/swap-approval/{id}/approve',
+    [App\Http\Controllers\SwapApprovalController::class,'approve'])
+    ->name('swap.approval.approve');
+
+    Route::post('/swap-approval/{id}/reject',
+    [App\Http\Controllers\SwapApprovalController::class,'reject'])
+    ->name('swap.approval.reject');
 
 });
 
@@ -313,6 +338,20 @@ Route::get('/admin/export/{month}/{year}', function ($month, $year) {
         "Laporan_Absensi_{$month}_{$year}.xlsx"
     );
 })->name('admin.export.monthly');
+
+// =======================
+// ADMIN APPROVAL TUKAR JADWAL
+// =======================
+
+Route::get('/admin/swap-requests', [App\Http\Controllers\AdminSwapController::class, 'index'])
+    ->name('admin.swap.index');
+
+Route::post('/admin/swap-requests/{id}/approve', [App\Http\Controllers\AdminSwapController::class, 'approve'])
+    ->name('admin.swap.approve');
+
+Route::post('/admin/swap-requests/{id}/reject', [App\Http\Controllers\AdminSwapController::class, 'reject'])
+    ->name('admin.swap.reject');
+
 
 });
 Route::post('/invite', [InvitationController::class, 'invite'])->name('invite');

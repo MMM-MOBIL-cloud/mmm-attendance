@@ -202,7 +202,25 @@ $isWorkDay = in_array($todayName, $workDays);
     </button>
 </form>
 @endif
+
 </div><div class="mt-10">
+    <a href="{{ route('swap.index') }}"
+class="inline-flex items-center mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
+
+<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none"
+viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+d="M4 7h16M4 12h16M4 17h16"/>
+</svg>
+
+Tukar Jadwal
+</a>
+<a href="{{ route('swap.approval.index') }}"
+class="bg-purple-600 text-white px-4 py-2 rounded">
+
+Approval Tukar Jadwal
+
+</a>
     <h2 class="text-xl font-semibold mb-4">Riwayat Absensi</h2>
 
     <div class="overflow-x-auto">

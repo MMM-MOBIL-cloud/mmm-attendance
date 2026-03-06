@@ -71,7 +71,25 @@
             {{ $totalPulangCepat }}
         </p>
     </div>
+<a href="{{ route('admin.swap.index') }}"
+class="inline-flex items-center px-4 py-2 ml-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow text-sm font-semibold transition">
 
+<svg xmlns="http://www.w3.org/2000/svg"
+class="h-4 w-4 mr-2"
+fill="none"
+viewBox="0 0 24 24"
+stroke="currentColor">
+
+<path stroke-linecap="round"
+stroke-linejoin="round"
+stroke-width="2"
+d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>
+
+</svg>
+
+Tukar Jadwal
+
+</a>
 </div>
     <div class="grid grid-cols-2 gap-6 mb-8">
 
@@ -146,6 +164,35 @@
 </div>
 
     {{-- Tabel --}}
+    <form method="GET" class="mb-4 flex gap-3">
+
+<select name="user_id" class="border rounded px-3 py-2">
+<option value="">Semua User</option>
+
+@foreach($users as $user)
+<option value="{{ $user->id }}"
+{{ request('user_id') == $user->id ? 'selected' : '' }}>
+{{ $user->name }}
+</option>
+@endforeach
+
+</select>
+
+<input type="date"
+name="date"
+value="{{ request('date') }}"
+class="border rounded px-3 py-2">
+
+<button class="bg-blue-600 text-white px-4 py-2 rounded">
+Filter
+</button>
+
+<a href="{{ route('admin.dashboard') }}"
+class="bg-gray-500 text-white px-4 py-2 rounded">
+Reset
+</a>
+
+</form>
 <div class="bg-white p-6 rounded-xl shadow">
 
 <div class="overflow-x-auto">
@@ -389,7 +436,7 @@ MANUAL
 </table>
 
 <div class="mt-4">
-    {{ $attendances->links() }}
+    {{ $attendances->appends(request()->query())->links() }}
 </div>
 
 </div>
