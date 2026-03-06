@@ -164,6 +164,9 @@ Tukar Jadwal
 </div>
 
     {{-- Tabel --}}
+    <h2 class="text-xl font-bold mb-4">
+Riwayat Absensi Bulan {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}
+</h2>
     <form method="GET" class="mb-4 flex gap-3">
 
 <select name="user_id" class="border rounded px-3 py-2">
@@ -175,6 +178,28 @@ Tukar Jadwal
 {{ $user->name }}
 </option>
 @endforeach
+
+</select>
+<select name="month" class="border rounded px-3 py-2">
+
+<option value="">Semua Bulan</option>
+
+@for($m=1;$m<=12;$m++)
+<option value="{{ $m }}" {{ request('month') == $m ? 'selected' : '' }}>
+{{ \Carbon\Carbon::create()->month($m)->translatedFormat('F') }}
+</option>
+@endfor
+
+</select>
+<select name="year" class="border rounded px-3 py-2">
+
+<option value="">Semua Tahun</option>
+
+@for($y=2024;$y<=2035;$y++)
+<option value="{{ $y }}" {{ request('year') == $y ? 'selected' : '' }}>
+{{ $y }}
+</option>
+@endfor
 
 </select>
 

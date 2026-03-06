@@ -18,14 +18,35 @@ class AdminController extends Controller
         return view('admin.users', compact('users'));
     }
 
-    public function attendanceToday()
-    {
-        $attendances = Attendance::whereDate('date', today())
-                        ->with('user')
-                        ->get();
+    public function attendanceToday(Request $request)
+{
 
-        return view('admin.attendance_today', compact('attendances'));
+    $query = Attendance::with('user');
+
+    // filter user
+    if($request->user_id){
+        $query->where('user_id',$request->user_id);
     }
+
+    // filter tanggal
+    if($request->date){
+        $query->whereDate('date',$request->date);
+    }
+
+    // filter bulan
+    if($request->month){
+        $query->whereMonth('date',$request->month);
+    }
+
+    // filter tahun
+    if($request->year){
+        $query->whereYear('date',$request->year);
+    }
+
+    $attendances = $query->latest()->paginate(20);
+
+    return view('admin.attendance_today', compact('attendances'));
+}
 
     public function storeUser(Request $request)
 {

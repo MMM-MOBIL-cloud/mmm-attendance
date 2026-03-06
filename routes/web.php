@@ -32,10 +32,14 @@ Route::get('/dashboard', function () {
         ->where('date', $today)
         ->first();
 
-    $attendanceHistory = Attendance::where('user_id', auth()->id())
-        ->orderBy('date', 'desc')
-        ->take(7)
-        ->get();
+$currentMonth = now()->month;
+$currentYear = now()->year;
+
+$attendanceHistory = Attendance::where('user_id', auth()->id())
+    ->whereMonth('date', $currentMonth)
+    ->whereYear('date', $currentYear)
+    ->orderBy('date', 'desc')
+    ->get();
 
     // Rekap Bulanan
     $currentMonth = now()->month;
