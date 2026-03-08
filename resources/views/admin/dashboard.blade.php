@@ -90,6 +90,12 @@ d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>
 Tukar Jadwal
 
 </a>
+<a href="{{ route('izin.kuliah.admin') }}"
+class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow">
+
+📚 Izin Kuliah
+
+</a>
 </div>
     <div class="grid grid-cols-2 gap-6 mb-8">
 

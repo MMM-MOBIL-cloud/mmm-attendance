@@ -28,6 +28,10 @@
     <p class="text-gray-500 text-sm mt-1">
         Sistem Absensi MMM MOBIL
     </p>
+    <p class="text-gray-500 text-sm mt-1">
+    Batas Jam Check-in : 07:45 – 11:00 /
+    Jam Kerja    : 08:00 – 16:00
+    </p>
 </div>
 
     {{-- 🔔 NOTIFIKASI REJECT --}}
@@ -207,30 +211,27 @@ $isWorkDay = in_array($todayName, $workDays);
 
 <div class="mt-10 flex justify-center gap-4">
 
-    <a href="{{ route('swap.index') }}"
-       class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
+<a href="{{ route('swap.index') }}"
+   class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
 
-        <svg xmlns="http://www.w3.org/2000/svg"
-             class="h-4 w-4 mr-2"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor">
+    Tukar Jadwal
+</a>
 
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 7h16M4 12h16M4 17h16"/>
-        </svg>
+<a href="{{ route('swap.approval.index') }}"
+   class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
 
-        Tukar Jadwal
-    </a>
+    Approval Tukar Jadwal
+</a>
 
-    <a href="{{ route('swap.approval.index') }}"
-       class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
+@if(Auth::user()->is_student)
+<a href="/izin-kuliah"
+   class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
 
-        Approval Tukar Jadwal
+    Ajukan Izin Kuliah
+</a>
+@endif
 
-    </a>
+</div>
 
 </div>
 
@@ -269,6 +270,75 @@ $isWorkDay = in_array($todayName, $workDays);
             </tbody>
         </table>
     </div>
+    @if(Auth::user()->is_student)
+
+    <h2 class="text-xl font-semibold text-center mt-10 mb-4">
+Riwayat Izin Kuliah
+</h2>
+
+<div class="overflow-x-auto">
+<table class="min-w-full bg-white shadow-md rounded-lg">
+
+<thead>
+<tr class="bg-gray-100 text-left">
+<th class="px-4 py-2">Tanggal</th>
+<th class="px-4 py-2">Jam Kuliah</th>
+<th class="px-4 py-2">Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+@forelse($izinKuliahHistory as $izin)
+
+<tr class="border-t">
+
+<td class="px-4 py-2">
+{{ \Carbon\Carbon::parse($izin->date)->format('d M Y') }}
+</td>
+
+<td class="px-4 py-2">
+{{ $izin->start_time }} - {{ $izin->end_time }}
+</td>
+
+<td class="px-4 py-2">
+
+@if($izin->status == 'pending')
+<span class="bg-yellow-500 text-white px-2 py-1 rounded text-sm">
+Pending
+</span>
+
+@elseif($izin->status == 'approved')
+<span class="bg-green-600 text-white px-2 py-1 rounded text-sm">
+Approved
+</span>
+
+@else
+<span class="bg-red-600 text-white px-2 py-1 rounded text-sm">
+Rejected
+</span>
+@endif
+
+</td>
+
+</tr>
+
+@empty
+
+<tr>
+<td colspan="3" class="px-4 py-4 text-center text-gray-500">
+Belum ada riwayat izin kuliah
+</td>
+</tr>
+
+@endforelse
+
+</tbody>
+</table>
+</div>
+
+@endif
+
 </div>
             </div>
         </div>

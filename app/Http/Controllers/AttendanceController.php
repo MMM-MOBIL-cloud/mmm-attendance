@@ -7,6 +7,8 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Notifications\AttendanceRejectedNotification;
+use Carbon\Carbon;
+use App\Models\CollegePermission;
 
 class AttendanceController extends Controller
 {
@@ -80,6 +82,15 @@ $batasMulai = now()->setTime(7, 45, 0);
 
 if ($now->lt($batasMulai)) {
     return back()->with('error', 'Check-in hanya bisa mulai jam 07:45.');
+}
+
+// ======================
+// BATAS AKHIR CHECK-IN 11:00
+// ======================
+$batasAkhir = now()->setTime(11, 0, 0);
+
+if ($now->gt($batasAkhir)) {
+    return back()->with('error', 'Check-in maksimal sampai jam 11:00.');
 }
 
     // ======================
@@ -269,10 +280,25 @@ if ($distance > $radius) {
         ? $batasHitungPulang
         : $now;
 
+// ======================
+// CEK IZIN KULIAH
+// ======================
+
+$izinKuliah = CollegePermission::where('user_id', auth()->id())
+    ->where('date', $today)
+    ->where('status', 'approved')
+    ->first();
+
+$status = $attendance->status;
+
+if ($izinKuliah) {
+    $status = 'Izin Kuliah';
+}
     $attendance->update([
-        'check_out' => $jamPulangFinal->format('H:i:s'),
-        'checkout_approval_status' => $checkoutApproval
-    ]);
+    'check_out' => $jamPulangFinal->format('H:i:s'),
+    'checkout_approval_status' => $checkoutApproval,
+    'status' => $status
+]);
 
     return back()->with('success', 'Check-out berhasil.');
 }

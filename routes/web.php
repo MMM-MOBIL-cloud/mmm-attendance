@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ScheduleSwapController;
+use App\Http\Controllers\CollegePermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,6 +92,10 @@ $sisaMenitTerlambat = $totalMenitTerlambat % 60;
         ->whereNull('check_out')
         ->count();
 
+    $izinKuliahHistory = \App\Models\CollegePermission::where('user_id', auth()->id())
+    ->orderBy('date','desc')
+    ->get();
+
     return view('dashboard', [
         'attendanceToday' => $attendanceToday,
         'attendanceHistory' => $attendanceHistory,
@@ -99,6 +104,7 @@ $sisaMenitTerlambat = $totalMenitTerlambat % 60;
         'totalJamTerlambat' => $totalJamTerlambat,
         'sisaMenitTerlambat' => $sisaMenitTerlambat,
         'totalBelumPulang' => $totalBelumPulang,
+        'izinKuliahHistory' => $izinKuliahHistory,
     ]);
 
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -144,9 +150,27 @@ Route::middleware(['auth'])->group(function () {
     [App\Http\Controllers\SwapApprovalController::class,'reject'])
     ->name('swap.approval.reject');
 
+    Route::get('/izin-kuliah', [CollegePermissionController::class,'create'])->name('izin.kuliah');
+
+    Route::post('/izin-kuliah/store', [CollegePermissionController::class,'store'])->name('izin.kuliah.store');
+
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
+
+    // ========================
+    // ADMIN IZIN KULIAH
+    // ========================
+
+    Route::get('/admin/izin-kuliah', [CollegePermissionController::class,'index'])
+        ->name('izin.kuliah.admin');
+
+    Route::post('/admin/izin-kuliah/{id}/approve', [CollegePermissionController::class,'approve'])
+        ->name('izin.kuliah.approve');
+
+    Route::post('/admin/izin-kuliah/{id}/reject', [CollegePermissionController::class,'reject'])
+        ->name('izin.kuliah.reject');
+
     // =======================
 // APPROVE / REJECT CHECKOUT
 // =======================
