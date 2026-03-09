@@ -11,6 +11,9 @@ class Kernel extends ConsoleKernel
     {
         // Auto checkout setiap hari jam 21:00
         $schedule->command('attendance:auto-checkout')->dailyAt('21:00');
+
+        // Hapus foto absensi bulan sebelumnya setiap tanggal 1 jam 01:00
+    $schedule->command('attendance:delete-old-photos')->monthlyOn(1, '01:00');
     }
 
     protected function commands(): void

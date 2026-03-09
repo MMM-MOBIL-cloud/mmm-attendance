@@ -25,6 +25,10 @@ class User extends Authenticatable
     'position',
     'shift_start',
     'shift_end',
+    'can_swap_schedule',
+    'can_approve_swap',
+    'can_student_leave',
+    'can_general_leave',
     'invitation_token',
     'is_active'
 ];

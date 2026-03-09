@@ -128,7 +128,12 @@ public function updateUser(Request $request, $id)
     $user = User::findOrFail($id);
 
     $user->update([
-        'position' => $request->position
+        'position' => $request->position,
+
+        'can_swap_schedule' => $request->has('can_swap_schedule'),
+        'can_approve_swap' => $request->has('can_approve_swap'),
+        'can_student_leave' => $request->has('can_student_leave'),
+        'can_general_leave' => $request->has('can_general_leave'),
     ]);
 
     return redirect()->route('admin.users')

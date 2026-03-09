@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ScheduleSwapController;
 use App\Http\Controllers\CollegePermissionController;
+use App\Http\Controllers\GeneralLeaveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -154,6 +155,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/izin-kuliah/store', [CollegePermissionController::class,'store'])->name('izin.kuliah.store');
 
+    Route::get('/izin', [GeneralLeaveController::class, 'index'])->name('izin.index');
+
+    Route::get('/izin/create', [GeneralLeaveController::class, 'create'])->name('izin.create');
+
+    Route::post('/izin/store', [GeneralLeaveController::class, 'store'])->name('izin.store');
+
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -170,6 +177,19 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::post('/admin/izin-kuliah/{id}/reject', [CollegePermissionController::class,'reject'])
         ->name('izin.kuliah.reject');
+
+    // ========================
+// ADMIN IZIN UMUM
+// ========================
+
+Route::get('/admin/izin', [GeneralLeaveController::class, 'adminIndex'])
+    ->name('admin.izin.index');
+
+Route::post('/admin/izin/{id}/approve', [GeneralLeaveController::class, 'approve'])
+    ->name('admin.izin.approve');
+
+Route::post('/admin/izin/{id}/reject', [GeneralLeaveController::class, 'reject'])
+    ->name('admin.izin.reject');
 
     // =======================
 // APPROVE / REJECT CHECKOUT

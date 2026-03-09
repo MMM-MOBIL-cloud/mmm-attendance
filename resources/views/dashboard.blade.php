@@ -117,13 +117,49 @@ $workDays = DB::table('user_work_days')
 $isWorkDay = in_array($todayName, $workDays);
 @endphp
 
+@php
+$today = now()->format('Y-m-d');
+
+$izinHariIni = \App\Models\GeneralLeave::where('user_id', auth()->id())
+    ->where('date', $today)
+    ->where('status','approved')
+    ->first();
+
+$isFullLeave = false;
+
+if($izinHariIni){
+
+    $leaveStart = \Carbon\Carbon::parse($izinHariIni->start_time);
+    $leaveEnd = \Carbon\Carbon::parse($izinHariIni->end_time);
+
+    $workStart = \Carbon\Carbon::createFromTime(8,0,0);
+    $workEnd = \Carbon\Carbon::createFromTime(16,0,0);
+
+    if($leaveStart <= $workStart && $leaveEnd >= $workEnd){
+        $isFullLeave = true;
+    }
+
+}
+@endphp
+
 @if(!$isWorkDay)
 <div style="background:#FEF3C7; border:1px solid #F59E0B; color:#92400E; padding:10px; border-radius:8px; margin-bottom:15px;">
 ⚠️ Hari ini bukan jadwal kerja anda.
 </div>
 @endif
 
-    @if($isWorkDay && (!$attendanceToday || $attendanceToday->approval_status == 'Rejected'))
+@if($isFullLeave)
+<div style="background:#DBEAFE; border:1px solid #3B82F6; color:#1E40AF; padding:10px; border-radius:8px; margin-bottom:15px;">
+📌 Anda izin penuh hari ini (08:00 - 16:00).
+</div>
+
+@elseif($izinHariIni)
+<div style="background:#DBEAFE; border:1px solid #3B82F6; color:#1E40AF; padding:10px; border-radius:8px; margin-bottom:15px;">
+📌 Anda memiliki izin sebagian hari ini.
+</div>
+@endif
+
+    @if($isWorkDay && !$isFullLeave && (!$attendanceToday || $attendanceToday->approval_status == 'Rejected'))
 <form method="POST" action="{{ route('check.in') }}">
     @csrf
 
@@ -190,10 +226,10 @@ $isWorkDay = in_array($todayName, $workDays);
     </div>
 @endif
 
-</form>
+
 @endif
 
-@if($isWorkDay)
+@if($isWorkDay && !$isFullLeave)
 <form method="POST" action="{{ route('check.out') }}" class="mt-2">
     @csrf
     <input type="hidden" name="latitude" id="latitudeOut">
@@ -211,23 +247,31 @@ $isWorkDay = in_array($todayName, $workDays);
 
 <div class="mt-10 flex justify-center gap-4">
 
+@if(Auth::user()->can_swap_schedule)
 <a href="{{ route('swap.index') }}"
    class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
-
     Tukar Jadwal
 </a>
+@endif
 
+@if(Auth::user()->can_approve_swap)
 <a href="{{ route('swap.approval.index') }}"
    class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
-
     Approval Tukar Jadwal
 </a>
+@endif
 
-@if(Auth::user()->is_student)
+@if(Auth::user()->can_student_leave)
 <a href="/izin-kuliah"
    class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
-
     Ajukan Izin Kuliah
+</a>
+@endif
+
+@if(Auth::user()->can_general_leave)
+<a href="/izin"
+   class="inline-flex items-center bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow">
+    Ajukan Izin
 </a>
 @endif
 

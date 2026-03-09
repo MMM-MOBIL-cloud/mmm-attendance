@@ -40,6 +40,40 @@ Edit User - {{ $user->name }}
 </select>
 </div>
 
+<div class="mb-6">
+
+<label class="block font-semibold mb-2">Akses Fitur</label>
+
+<div class="flex items-center mb-2">
+<input type="checkbox" name="can_swap_schedule" value="1"
+{{ $user->can_swap_schedule ? 'checked' : '' }}
+class="mr-2">
+<span>Bisa Tukar Jadwal</span>
+</div>
+
+<div class="flex items-center mb-2">
+<input type="checkbox" name="can_approve_swap" value="1"
+{{ $user->can_approve_swap ? 'checked' : '' }}
+class="mr-2">
+<span>Bisa Approval Tukar Jadwal</span>
+</div>
+
+<div class="flex items-center mb-2">
+<input type="checkbox" name="can_student_leave" value="1"
+{{ $user->can_student_leave ? 'checked' : '' }}
+class="mr-2">
+<span>Bisa Ajukan Izin Kuliah</span>
+</div>
+
+<div class="flex items-center mb-2">
+<input type="checkbox" name="can_general_leave" value="1"
+{{ $user->can_general_leave ? 'checked' : '' }}
+class="mr-2">
+<span>Bisa Ajukan Izin (Tidak dihitung jam kerja)</span>
+</div>
+
+</div>
+
 <button class="bg-blue-600 text-white px-4 py-2 rounded">
 Update User
 </button>
