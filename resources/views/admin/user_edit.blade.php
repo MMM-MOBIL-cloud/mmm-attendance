@@ -20,6 +20,22 @@ Edit User - {{ $user->name }}
 <input type="email" name="email" value="{{ $user->email }}" class="border p-2 rounded w-full">
 </div>
 
+<div class="mt-4">
+<label class="block font-semibold mb-1">Role</label>
+
+<select name="role" class="w-full border rounded px-3 py-2">
+
+<option value="user" {{ $user->role == 'user' ? 'selected' : '' }}>
+User
+</option>
+
+<option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>
+Admin
+</option>
+
+</select>
+</div>
+
 <div class="mb-4">
 <label class="block font-semibold mb-1">Jabatan</label>
 
@@ -36,6 +52,22 @@ Edit User - {{ $user->name }}
 <option value="Videographer/Photographer" {{ $user->position=='Videographer/Photographer'?'selected':'' }}>Videographer/Photographer</option>
 <option value="Office Boy / Cleaning Service" {{ $user->position=='Office Boy / Cleaning Service'?'selected':'' }}>Office Boy / Cleaning Service</option>
 <option value="Other" {{ $user->position=='Other'?'selected':'' }}>Other</option>
+
+</select>
+</div>
+
+<div class="mt-4">
+<label class="block font-semibold mb-1">Work Group</label>
+
+<select name="work_group" class="w-full border rounded px-3 py-2">
+
+<option value="office" {{ $user->work_group == 'office' ? 'selected' : '' }}>
+Office
+</option>
+
+<option value="sales" {{ $user->work_group == 'sales' ? 'selected' : '' }}>
+Sales
+</option>
 
 </select>
 </div>

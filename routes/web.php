@@ -312,6 +312,57 @@ $rankingHadir = \App\Models\User::withCount(['attendances as total_hadir' => fun
 ->get();
 
 
+// Ranking berdasarkan hadir + jam kerja
+$rankingJamKerja = DB::table('attendances')
+    ->join('users', 'attendances.user_id', '=', 'users.id')
+    ->select(
+        'users.name',
+        'users.id',
+        DB::raw('COUNT(attendances.id) as total_hadir'),
+        DB::raw('SUM(attendances.work_hours) as total_jam')
+    )
+    ->whereMonth('attendances.date', now()->month)
+    ->whereYear('attendances.date', now()->year)
+    ->groupBy('users.id', 'users.name')
+    ->orderByDesc('total_hadir')
+    ->orderByDesc('total_jam')
+    ->limit(5)
+    ->get();
+
+$rankingSales = DB::table('attendances')
+    ->join('users', 'attendances.user_id', '=', 'users.id')
+    ->select(
+        'users.name',
+        'users.id',
+        DB::raw('COUNT(attendances.id) as total_hadir'),
+        DB::raw('SUM(attendances.work_hours) as total_jam')
+    )
+    ->where('users.work_group', 'sales')
+    ->whereMonth('attendances.date', now()->month)
+    ->whereYear('attendances.date', now()->year)
+    ->groupBy('users.id', 'users.name')
+    ->orderByDesc('total_hadir')
+    ->orderByDesc('total_jam')
+    ->limit(5)
+    ->get();
+
+$rankingOffice = DB::table('attendances')
+    ->join('users', 'attendances.user_id', '=', 'users.id')
+    ->select(
+        'users.name',
+        'users.id',
+        DB::raw('COUNT(attendances.id) as total_hadir'),
+        DB::raw('SUM(attendances.work_hours) as total_jam')
+    )
+    ->where('users.work_group', 'office')
+    ->whereMonth('attendances.date', now()->month)
+    ->whereYear('attendances.date', now()->year)
+    ->groupBy('users.id', 'users.name')
+    ->orderByDesc('total_hadir')
+    ->orderByDesc('total_jam')
+    ->limit(5)
+    ->get();
+
 // Ranking paling sering terlambat
 $rankingTerlambat = \App\Models\User::withCount(['attendances as total_terlambat' => function ($query) {
     $query->whereMonth('date', now()->month)
@@ -355,6 +406,9 @@ return view('admin.dashboard', compact(
     'totalBelumPulangHariIni',
     'rankingHadir',
     'rankingTerlambat',
+    'rankingJamKerja',
+    'rankingSales',
+    'rankingOffice',
     'totalHadirBulanIni',
     'totalTerlambatBulanIni',
     'totalPulangCepat'

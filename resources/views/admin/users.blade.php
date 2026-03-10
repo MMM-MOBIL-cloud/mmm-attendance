@@ -53,6 +53,18 @@ class="border p-2 rounded w-full" required>
 </div>
 
 <div>
+<label class="text-sm text-gray-600">Work Group</label>
+
+<select name="work_group" class="border p-2 rounded w-full">
+
+<option value="">Pilih Work Group</option>
+<option value="office">Office</option>
+<option value="sales">Sales</option>
+
+</select>
+</div>
+
+<div>
 <label class="text-sm text-gray-600">Jam Masuk</label>
 <input type="time" name="shift_start"
 class="border p-2 rounded w-full">
@@ -131,12 +143,13 @@ Export Absensi
 <table class="min-w-full bg-white shadow rounded">
 
 <thead>
-<tr class="bg-gray-100">
-<th class="p-2">Nama</th>
-<th class="p-2">Email</th>
-<th class="p-2">Role</th>
-<th class="p-2">Jabatan</th>
-<th class="p-2">Action</th>
+<tr class="bg-gray-100 text-center">
+<th class="p-3">Nama</th>
+<th class="p-3">Email</th>
+<th class="p-3">Role</th>
+<th class="p-3">Jabatan</th>
+<th class="p-3">Work Group</th>
+<th class="p-3">Action</th>
 </tr>
 </thead>
 
@@ -144,26 +157,49 @@ Export Absensi
 
 @foreach($users as $user)
 
-<tr class="border-t">
-<td class="p-2">{{ $user->name }}</td>
-<td class="p-2">{{ $user->email }}</td>
-<td class="p-2">{{ $user->role }}</td>
-<td class="p-2">
+<tr class="border-t text-center hover:bg-gray-50 cursor-pointer"
+onclick="window.location='{{ route('admin.user.edit', $user->id) }}'">
 
-{{ $user->position ?? '-' }}
-
+<td class="p-3">
 <a href="{{ route('admin.user.edit', $user->id) }}"
-class="ml-2 text-gray-600 hover:text-blue-600">
-⚙️
+class="text-blue-600 hover:underline font-semibold">
+{{ $user->name }}
+</a>
+</td>
+
+<td class="p-3">
+{{ $user->email }}
+</td>
+
+<td class="p-3">
+{{ $user->role }}
+</td>
+
+<td class="p-3">
+
+<div class="flex items-center justify-center gap-2">
+
+<span>
+{{ $user->position ?? '-' }}
+</span>
+
+</div>
+
+</td>
+
+<td class="p-3 capitalize">
+{{ $user->work_group ?? '-' }}
+</td>
+
+<td class="p-3">
+
+<a href="{{ route('admin.user.schedule', $user->id) }}"
+class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
+Atur Jadwal
 </a>
 
 </td>
-<td class="p-2">
-<a href="{{ route('admin.user.schedule', $user->id) }}"
-   class="bg-yellow-500 text-white px-3 py-1 rounded">
-   Atur Jadwal
-</a>
-</td>
+
 </tr>
 
 @endforeach

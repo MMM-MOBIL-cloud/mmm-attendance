@@ -283,6 +283,20 @@ $attendance->checkout_type = 'manual';
 
 $attendance->checkout_approval_status = 'Approved';
 
+/* =============================
+   HITUNG JAM KERJA
+============================= */
+
+$checkIn = \Carbon\Carbon::parse($attendance->check_in);
+$checkOut = \Carbon\Carbon::parse($checkoutTime);
+
+$minutes = $checkIn->diffInMinutes($checkOut);
+
+$attendance->work_hours = round($minutes / 60, 2);
+
+/* ============================= */
+
+
 $attendance->save();
 
     $attendance = Attendance::where('user_id', auth()->id())

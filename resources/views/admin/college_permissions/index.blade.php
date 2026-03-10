@@ -4,6 +4,40 @@
 
 <h2 class="text-2xl font-bold mb-6">Approval Izin Kuliah</h2>
 
+<form method="GET" class="mb-4 flex gap-2">
+
+<select name="month" class="border rounded px-3 py-2">
+<option value="">Semua Bulan</option>
+<option value="1">Januari</option>
+<option value="2">Februari</option>
+<option value="3">Maret</option>
+<option value="4">April</option>
+<option value="5">Mei</option>
+<option value="6">Juni</option>
+<option value="7">Juli</option>
+<option value="8">Agustus</option>
+<option value="9">September</option>
+<option value="10">Oktober</option>
+<option value="11">November</option>
+<option value="12">Desember</option>
+</select>
+
+<select name="year" class="border rounded px-3 py-2">
+<option value="">Semua Tahun</option>
+<option value="2026">2026</option>
+<option value="2025">2025</option>
+<option value="2024">2024</option>
+</select>
+
+<button class="bg-blue-600 text-white px-4 py-2 rounded">
+Filter
+</button>
+
+<a href="{{ url()->current() }}" class="bg-gray-500 text-white px-4 py-2 rounded">
+Reset
+</a>
+
+</form>
 <table class="min-w-full bg-white shadow rounded-lg">
 
 <thead class="bg-gray-100 text-center">

@@ -36,9 +36,19 @@ class CollegePermissionController extends Controller
         return redirect()->back()->with('success','Izin kuliah berhasil diajukan');
     }
 
-    public function index()
+    public function index(Request $request)
 {
-    $permissions = \App\Models\CollegePermission::with('user')->latest()->get();
+    $query = \App\Models\CollegePermission::with('user');
+
+    if ($request->month) {
+        $query->whereMonth('date', $request->month);
+    }
+
+    if ($request->year) {
+        $query->whereYear('date', $request->year);
+    }
+
+    $permissions = $query->latest()->get();
 
     return view('admin.college_permissions.index', compact('permissions'));
 }

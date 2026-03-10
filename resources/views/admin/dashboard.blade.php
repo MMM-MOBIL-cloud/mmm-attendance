@@ -96,7 +96,14 @@ class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow">
 📚 Izin Kuliah
 
 </a>
+<a href="{{ route('admin.izin.index') }}"
+class="bg-purple-600 text-white px-4 py-2 rounded text-center">
+📝 Izin Karyawan
+</a>
+
 </div>
+</div>
+
     <div class="grid grid-cols-2 gap-6 mb-8">
 
     <!-- Ranking Rajin -->
@@ -121,6 +128,7 @@ class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow">
         @endforeach
     </div>
 
+
     <!-- Ranking Terlambat -->
     <div class="bg-white p-5 rounded-xl shadow">
         <h3 class="font-semibold mb-4 text-red-600">
@@ -142,6 +150,83 @@ class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow">
             </div>
         @endforeach
     </div>
+
+</div>
+<div class="bg-white p-5 rounded-xl shadow mt-6">
+
+<h3 class="font-semibold mb-4 text-blue-600">
+⏱ Ranking Hadir + Jam Kerja
+</h3>
+
+@foreach($rankingJamKerja as $index => $user)
+
+<div class="flex justify-between items-center border-b py-2">
+
+<div>
+<span class="font-bold text-gray-400">
+#{{ $index + 1 }}
+</span>
+
+<span class="ml-2">
+{{ $user->name }}
+</span>
+</div>
+
+<div class="text-sm text-gray-600">
+{{ $user->total_hadir }} hari |
+{{ round($user->total_jam,2) }} jam
+</div>
+
+</div>
+
+@endforeach
+</div>
+
+<div class="bg-white p-5 rounded-xl shadow mt-6">
+
+<h3 class="font-semibold mb-4 text-blue-600">
+🏆 Ranking Sales (Hadir + Jam Kerja)
+</h3>
+
+@foreach($rankingSales as $index => $user)
+
+<div class="flex justify-between border-b py-2">
+
+<span class="text-gray-600">
+#{{ $index + 1 }} {{ $user->name }}
+</span>
+
+<span class="text-blue-600 font-semibold">
+{{ $user->total_hadir }} hari | {{ round($user->total_jam,2) }} jam
+</span>
+
+</div>
+
+@endforeach
+
+</div>
+
+<div class="bg-white p-5 rounded-xl shadow mt-6">
+
+<h3 class="font-semibold mb-4 text-green-600">
+🏆 Ranking Office (Hadir + Jam Kerja)
+</h3>
+
+@foreach($rankingOffice as $index => $user)
+
+<div class="flex justify-between border-b py-2">
+
+<span class="text-gray-600">
+#{{ $index + 1 }} {{ $user->name }}
+</span>
+
+<span class="text-green-600 font-semibold">
+{{ $user->total_hadir }} hari | {{ round($user->total_jam,2) }} jam
+</span>
+
+</div>
+
+@endforeach
 
 </div>
 

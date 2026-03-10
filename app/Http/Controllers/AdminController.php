@@ -56,6 +56,7 @@ class AdminController extends Controller
     'password' => Hash::make($request->password),
     'role' => $request->role,
     'position' => $request->position,
+    'work_group' => $request->work_group,
     'shift_start' => $request->shift_start,
     'shift_end' => $request->shift_end,
 ]);
