@@ -258,7 +258,7 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
     <h2 class="text-xl font-bold mb-4">
 Riwayat Absensi Bulan {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}
 </h2>
-    <form method="GET" class="mb-4 flex gap-3">
+    <form method="GET" class="mb-4 grid grid-cols-2 lg:flex gap-3">
 
 <select name="user_id" class="border rounded px-3 py-2">
 <option value="">Semua User</option>
@@ -312,8 +312,7 @@ Reset
 <div class="bg-white p-6 rounded-xl shadow">
 
 <div class="overflow-x-auto">
-<table class="min-w-[1200px] text-center border-collapse">
-
+<table class="min-w-full text-center border-collapse">
 
     <thead class="bg-gray-100">
         <tr>

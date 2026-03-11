@@ -48,7 +48,7 @@
                <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
 
                 <div class="bg-white shadow-lg rounded-2xl p-6">
                     <h2 class="text-lg font-semibold text-gray-700">Absen Hari Ini</h2>

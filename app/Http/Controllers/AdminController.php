@@ -23,6 +23,11 @@ class AdminController extends Controller
 
     $query = Attendance::with('user');
 
+    // ⭐ DEFAULT tampilkan hari ini
+    if(!$request->date && !$request->month && !$request->year){
+        $query->whereDate('date', now()->toDateString());
+    }
+
     // filter user
     if($request->user_id){
         $query->where('user_id',$request->user_id);
@@ -129,16 +134,17 @@ public function updateUser(Request $request, $id)
     $user = User::findOrFail($id);
 
     $user->update([
-        'position' => $request->position,
+    'position' => $request->position,
+    'work_group' => $request->work_group,
 
-        'can_swap_schedule' => $request->has('can_swap_schedule'),
-        'can_approve_swap' => $request->has('can_approve_swap'),
-        'can_student_leave' => $request->has('can_student_leave'),
-        'can_general_leave' => $request->has('can_general_leave'),
-    ]);
+    'can_swap_schedule' => $request->has('can_swap_schedule'),
+    'can_approve_swap' => $request->has('can_approve_swap'),
+    'can_student_leave' => $request->has('can_student_leave'),
+    'can_general_leave' => $request->has('can_general_leave'),
+]);
 
     return redirect()->route('admin.users')
-        ->with('success','Jabatan berhasil diupdate');
+        ->with('success','Data user berhasil diupdate');
 }
 
 public function deleteUser($id)
@@ -149,6 +155,38 @@ public function deleteUser($id)
 
     return redirect()->route('admin.users')
         ->with('success','User berhasil dihapus');
+}
+
+public function dashboard()
+{
+    $today = now()->format('l'); // Monday, Tuesday dll
+
+    $users = User::all();
+
+    $jadwalHariIni = [];
+
+    foreach ($users as $user) {
+
+        $isScheduled = \DB::table('user_work_days')
+            ->where('user_id', $user->id)
+            ->where('day', strtolower($today))
+            ->exists();
+
+        if($isScheduled){
+
+            $sudahAbsen = Attendance::where('user_id', $user->id)
+                ->whereDate('date', now()->toDateString())
+                ->exists();
+
+            $jadwalHariIni[] = [
+                'name' => $user->name,
+                'work_group' => $user->work_group,
+                'status' => $sudahAbsen ? 'Sudah Absen' : 'Belum Absen'
+            ];
+        }
+    }
+
+    return view('admin.dashboard', compact('jadwalHariIni'));
 }
 
 }

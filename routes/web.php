@@ -28,6 +28,10 @@ Route::get('/', function () {
 
 // 🔹 Dashboard
 Route::get('/dashboard', function () {
+
+     if(auth()->user()->role == 'admin'){
+        return redirect()->route('admin.dashboard');
+    }
     $today = now()->format('Y-m-d');
 
     $attendanceToday = Attendance::where('user_id', auth()->id())
@@ -263,9 +267,12 @@ Route::post('/admin/users', function (\Illuminate\Http\Request $request) {
         $totalUsers = User::count();
         $totalAbsensi = \App\Models\Attendance::count();
 
-        $today = now()->format('Y-m-d');
+        $today = now()->toDateString();
 
-        $hadirHariIni = \App\Models\Attendance::where('date', $today)->count();
+$hadirHariIni = \App\Models\Attendance::whereDate('date', $today)
+    ->whereNotNull('check_in')
+    ->distinct('user_id')
+    ->count('user_id');
 
         // ✅ Grafik Bulanan
         $grafikRaw = \App\Models\Attendance::select(

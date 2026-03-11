@@ -23,6 +23,7 @@ class User extends Authenticatable
     'password',
     'role',
     'position',
+    'work_group',
     'shift_start',
     'shift_end',
     'can_swap_schedule',
