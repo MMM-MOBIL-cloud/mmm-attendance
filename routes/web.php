@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Attendance;
 use App\Exports\AttendanceExport;
@@ -27,93 +28,9 @@ Route::get('/', function () {
 });
 
 // 🔹 Dashboard
-Route::get('/dashboard', function () {
-
-     if(auth()->user()->role == 'admin'){
-        return redirect()->route('admin.dashboard');
-    }
-    $today = now()->format('Y-m-d');
-
-    $attendanceToday = Attendance::where('user_id', auth()->id())
-        ->where('date', $today)
-        ->first();
-
-$currentMonth = now()->month;
-$currentYear = now()->year;
-
-$attendanceHistory = Attendance::where('user_id', auth()->id())
-    ->whereMonth('date', $currentMonth)
-    ->whereYear('date', $currentYear)
-    ->orderBy('date', 'desc')
-    ->get();
-
-    // Rekap Bulanan
-    $currentMonth = now()->month;
-    $currentYear = now()->year;
-
-    $totalHadirBulanIni = Attendance::where('user_id', auth()->id())
-        ->whereMonth('date', $currentMonth)
-        ->whereYear('date', $currentYear)
-        ->whereNotNull('check_in')
-        ->count();
-
-    $totalTerlambatBulanIni = Attendance::where('user_id', auth()->id())
-        ->whereMonth('date', $currentMonth)
-        ->whereYear('date', $currentYear)
-        ->where('status', 'Terlambat')
-        ->count();
-
-    // ======================
-// HITUNG TOTAL MENIT TERLAMBAT BULAN INI
-// ======================
-
-$batasMasuk = \Carbon\Carbon::createFromTime(8, 15, 0);
-
-$totalMenitTerlambat = 0;
-
-$absensiTerlambat = Attendance::where('user_id', auth()->id())
-    ->whereMonth('date', $currentMonth)
-    ->whereYear('date', $currentYear)
-    ->where('status', 'Terlambat')
-    ->get();
-
-foreach ($absensiTerlambat as $absen) {
-    $jamMasuk = \Carbon\Carbon::parse($absen->check_in);
-    $selisih = $batasMasuk->diffInMinutes($jamMasuk, false);
-
-    if ($selisih > 0) {
-        $totalMenitTerlambat += $selisih;
-    }
-}
-
-// Konversi ke jam & menit
-$totalJamTerlambat = floor($totalMenitTerlambat / 60);
-$sisaMenitTerlambat = $totalMenitTerlambat % 60;
-
-    $totalBelumPulang = Attendance::where('user_id', auth()->id())
-        ->whereMonth('date', $currentMonth)
-        ->whereYear('date', $currentYear)
-        ->whereNotNull('check_in')
-        ->whereNull('check_out')
-        ->count();
-
-    $izinKuliahHistory = \App\Models\CollegePermission::where('user_id', auth()->id())
-    ->orderBy('date','desc')
-    ->get();
-
-    return view('dashboard', [
-        'attendanceToday' => $attendanceToday,
-        'attendanceHistory' => $attendanceHistory,
-        'totalHadirBulanIni' => $totalHadirBulanIni,
-        'totalTerlambatBulanIni' => $totalTerlambatBulanIni,
-        'totalJamTerlambat' => $totalJamTerlambat,
-        'sisaMenitTerlambat' => $sisaMenitTerlambat,
-        'totalBelumPulang' => $totalBelumPulang,
-        'izinKuliahHistory' => $izinKuliahHistory,
-    ]);
-
-})->middleware(['auth', 'verified'])->name('dashboard');
-
+Route::get('/dashboard', [UserDashboardController::class,'index'])
+    ->middleware(['auth','verified'])
+    ->name('dashboard');
 
 // 🔹 Profile
 Route::middleware('auth')->group(function () {
