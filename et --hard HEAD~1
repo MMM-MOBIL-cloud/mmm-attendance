@@ -1,0 +1,15 @@
+[33m477b9a5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Backup sebelum refactor dashboard admin & perbaikan fitur wrok grup, absen hari ini
+[33md3077c8[m Feat : Update halaman edit user: tambah role, work group, dan perbaiki style label
+[33mf8a9660[m feat: Menambahkan fitur izin umum, upload bukti, approval admin, dan perhitungan jam kerja otomatis
+[33me9bdfd0[m Fitur izin kuliah: dashboard user, riwayat izin kuliah, pembatasan user kuliah
+[33m53a80a1[m Rapikan dashboard admin dan  user layout dan riwayat absensi bulanan
+[33m55a63ae[m Feature: tukar jadwal user swap approval before admin approval
+[33m2c333d6[m Add auto checkout system, checkout type label (AUTO/MANUAL), and admin dashboard improvements
+[33m49107ac[m Add employee position, user schedule management, edit & delete user features
+[33md4dc53d[m Menambahkan export absensi per user bulanan + hari bahasa Indonesia + header laporan
+[33m9ead02e[m Update dashboard admin dan favicon MMM Attendance
+[33mb3bd78d[m Tambah fitur admin users dan attendance today
+[33mbe1e2ee[m Update dashboar admin tambah karyawan,undangan via email,buat halaman register
+[33mcc628a2[m Update dashboard, logo, attendance controller sebelum setup SMTP
+[33maa7f076[m perbaikan tampilan user selamat datang
+[33m72714ec[m Initial commit - Sistem Absensi MMM

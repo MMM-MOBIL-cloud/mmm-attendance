@@ -169,6 +169,9 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->group(function () {
 
+Route::get('/admin/dashboard', [AdminController::class,'dashboard'])
+    ->name('admin.dashboard');
+
     // ========================
     // ADMIN IZIN KULIAH
     // ========================
@@ -210,219 +213,6 @@ Route::post('/admin/izin/{id}/reject', [GeneralLeaveController::class, 'reject']
 
     Route::post('/attendance/{id}/reject', [AttendanceController::class, 'reject'])
     ->name('attendance.reject');
-    Route::get('/admin/dashboard', function (\Illuminate\Http\Request $request) {
-
-        $query = \App\Models\Attendance::with('user');
-
-        if ($request->filled('date')) {
-            $query->where('date', $request->date);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
-    Route::get('/admin/users', function () {
-    $users = \App\Models\User::all();
-    return view('admin.users', compact('users'));
-})->name('admin.users');
-
-Route::post('/admin/users', function (\Illuminate\Http\Request $request) {
-
-    \App\Models\User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => bcrypt($request->password),
-        'role' => $request->role,
-    ]);
-
-    return back()->with('success', 'User berhasil ditambahkan');
-
-    Route::get('/admin/users', function () {
-    $users = \App\Models\User::all();
-    return view('admin.users', compact('users'));
-})->name('admin.users');
-
-Route::post('/admin/users', function (\Illuminate\Http\Request $request) {
-
-    \App\Models\User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => bcrypt($request->password),
-        'role' => $request->role,
-        'shift_start' => $request->shift_start,
-        'shift_end' => $request->shift_end,
-    ]);
-
-    return back()->with('success', 'User berhasil ditambahkan');
-})->name('admin.users.store');
-
-})->name('admin.users.store');
-
-        // ✅ Pagination (bukan get())
-        $attendances = $query->orderBy('date', 'desc')->paginate(10);
-
-        $users = User::all();
-
-        // Statistik
-        $totalUsers = User::count();
-        $totalAbsensi = \App\Models\Attendance::count();
-
-        $today = now()->toDateString();
-
-$hadirHariIni = \App\Models\Attendance::whereDate('date', $today)
-    ->whereNotNull('check_in')
-    ->distinct('user_id')
-    ->count('user_id');
-
-        // ✅ Grafik Bulanan
-        $grafikRaw = \App\Models\Attendance::select(
-        DB::raw('MONTH(date) as bulan'),
-        DB::raw('COUNT(*) as total')
-    )
-    ->whereYear('date', now()->year)
-    ->groupBy('bulan')
-    ->pluck('total', 'bulan');
-
-    // Statistik bulan ini
-$currentMonth = now()->month;
-$currentYear = now()->year;
-
-$totalHadirBulanIni = Attendance::whereMonth('date', $currentMonth)
-    ->whereYear('date', $currentYear)
-    ->whereNotNull('check_in')
-    ->count();
-
-$totalTerlambatBulanIni = Attendance::whereMonth('date', $currentMonth)
-    ->whereYear('date', $currentYear)
-    ->whereTime('check_in', '>', '08:00:00')
-    ->count();
-
-$totalBelumPulangHariIni = Attendance::whereDate('date', now())
-    ->whereNull('check_out')
-    ->count();
-
-// Buat array 12 bulan default 0
-$grafikBulanan = [];
-
-for ($i = 1; $i <= 12; $i++) {
-    $grafikBulanan[$i] = $grafikRaw[$i] ?? 0;
-}
-
-// Ranking paling rajin (hadir terbanyak bulan ini)
-$rankingHadir = \App\Models\User::withCount(['attendances as total_hadir' => function ($query) {
-    $query->whereMonth('date', now()->month)
-          ->whereYear('date', now()->year)
-          ->whereNotNull('check_in');
-}])
-->orderByDesc('total_hadir')
-->take(5)
-->get();
-
-
-// Ranking berdasarkan hadir + jam kerja
-$rankingJamKerja = DB::table('attendances')
-    ->join('users', 'attendances.user_id', '=', 'users.id')
-    ->select(
-        'users.name',
-        'users.id',
-        DB::raw('COUNT(attendances.id) as total_hadir'),
-        DB::raw('SUM(attendances.work_hours) as total_jam')
-    )
-    ->whereMonth('attendances.date', now()->month)
-    ->whereYear('attendances.date', now()->year)
-    ->groupBy('users.id', 'users.name')
-    ->orderByDesc('total_hadir')
-    ->orderByDesc('total_jam')
-    ->limit(5)
-    ->get();
-
-$rankingSales = DB::table('attendances')
-    ->join('users', 'attendances.user_id', '=', 'users.id')
-    ->select(
-        'users.name',
-        'users.id',
-        DB::raw('COUNT(attendances.id) as total_hadir'),
-        DB::raw('SUM(attendances.work_hours) as total_jam')
-    )
-    ->where('users.work_group', 'sales')
-    ->whereMonth('attendances.date', now()->month)
-    ->whereYear('attendances.date', now()->year)
-    ->groupBy('users.id', 'users.name')
-    ->orderByDesc('total_hadir')
-    ->orderByDesc('total_jam')
-    ->limit(5)
-    ->get();
-
-$rankingOffice = DB::table('attendances')
-    ->join('users', 'attendances.user_id', '=', 'users.id')
-    ->select(
-        'users.name',
-        'users.id',
-        DB::raw('COUNT(attendances.id) as total_hadir'),
-        DB::raw('SUM(attendances.work_hours) as total_jam')
-    )
-    ->where('users.work_group', 'office')
-    ->whereMonth('attendances.date', now()->month)
-    ->whereYear('attendances.date', now()->year)
-    ->groupBy('users.id', 'users.name')
-    ->orderByDesc('total_hadir')
-    ->orderByDesc('total_jam')
-    ->limit(5)
-    ->get();
-
-// Ranking paling sering terlambat
-$rankingTerlambat = \App\Models\User::withCount(['attendances as total_terlambat' => function ($query) {
-    $query->whereMonth('date', now()->month)
-          ->whereYear('date', now()->year)
-          ->whereTime('check_in', '>', '08:00:00');
-}])
-->orderByDesc('total_terlambat')
-->take(5)
-->get();
-
-$currentMonth = now()->month;
-$currentYear = now()->year;
-
-// Total hadir bulan ini
-$totalHadirBulanIni = \App\Models\Attendance::whereMonth('date', $currentMonth)
-    ->whereYear('date', $currentYear)
-    ->where('status', 'like', '%Hadir%')
-    ->count();
-
-// Total terlambat bulan ini
-$totalTerlambatBulanIni = \App\Models\Attendance::whereMonth('date', $currentMonth)
-    ->whereYear('date', $currentYear)
-    ->where('status', 'like', '%Terlambat%')
-    ->count();
-
-// Total pulang cepat
-$totalPulangCepat = \App\Models\Attendance::whereMonth('date', $currentMonth)
-    ->whereYear('date', $currentYear)
-    ->where('status', 'like', '%Pulang Cepat%')
-    ->count();
-
-return view('admin.dashboard', compact(
-    'attendances',
-    'users',
-    'totalUsers',
-    'totalAbsensi',
-    'hadirHariIni',
-    'grafikBulanan',
-    'totalHadirBulanIni',
-    'totalTerlambatBulanIni',
-    'totalBelumPulangHariIni',
-    'rankingHadir',
-    'rankingTerlambat',
-    'rankingJamKerja',
-    'rankingSales',
-    'rankingOffice',
-    'totalHadirBulanIni',
-    'totalTerlambatBulanIni',
-    'totalPulangCepat'
-));
-
-    })->name('admin.dashboard');
-
 
     Route::get('/admin/export', function () {
         return Excel::download(new AttendanceExport, 'absensi.xlsx');
@@ -461,11 +251,10 @@ Route::post('/admin/swap-requests/{id}/approve', [App\Http\Controllers\AdminSwap
 Route::post('/admin/swap-requests/{id}/reject', [App\Http\Controllers\AdminSwapController::class, 'reject'])
     ->name('admin.swap.reject');
 
-
-});
 Route::post('/invite', [InvitationController::class, 'invite'])->name('invite');
 
 Route::get('/invite-register/{token}', [InvitationController::class, 'showRegister']);
+
 Route::post('/invite-register/{token}', [InvitationController::class, 'processRegister']);
 
 Route::get('/admin/users', [App\Http\Controllers\AdminController::class, 'users'])->name('admin.users');
@@ -488,5 +277,7 @@ Route::post('/admin/users/{id}/update', [AdminController::class, 'updateUser'])
 
 Route::delete('/admin/users/{id}/delete', [AdminController::class, 'deleteUser'])
     ->name('admin.user.delete');
+
+});
 
 require __DIR__.'/auth.php';

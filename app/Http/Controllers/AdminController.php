@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Attendance;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -55,30 +55,33 @@ class AdminController extends Controller
 
     public function storeUser(Request $request)
 {
+    $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:4',
+        'role' => 'required'
+    ]);
+
     $user = User::create([
-    'name' => $request->name,
-    'email' => $request->email,
-    'password' => Hash::make($request->password),
-    'role' => $request->role,
-    'position' => $request->position,
-    'work_group' => $request->work_group,
-    'shift_start' => $request->shift_start,
-    'shift_end' => $request->shift_end,
-]);
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => $request->role,
+        'position' => $request->position,
+        'work_group' => $request->work_group,
+        'shift_start' => $request->shift_start,
+        'shift_end' => $request->shift_end,
+    ]);
 
     if($request->work_days){
-
         foreach($request->work_days as $day){
-
-            \DB::table('user_work_days')->insert([
+            DB::table('user_work_days')->insert([
                 'user_id' => $user->id,
                 'day' => $day,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
-
         }
-
     }
 
     return redirect()->back()->with('success', 'User berhasil dibuat');
@@ -157,36 +160,159 @@ public function deleteUser($id)
         ->with('success','User berhasil dihapus');
 }
 
-public function dashboard()
+public function dashboard(Request $request)
 {
-    $today = now()->format('l'); // Monday, Tuesday dll
+    $query = Attendance::with('user');
+
+    if ($request->filled('date')) {
+        $query->where('date', $request->date);
+    }
+
+    if ($request->filled('user_id')) {
+        $query->where('user_id', $request->user_id);
+    }
+
+    $attendances = $query->latest()->paginate(10);
 
     $users = User::all();
 
-    $jadwalHariIni = [];
+    // Statistik
+    $totalUsers = User::count();
+    $totalAbsensi = Attendance::count();
 
-    foreach ($users as $user) {
+    $today = now()->toDateString();
 
-        $isScheduled = \DB::table('user_work_days')
-            ->where('user_id', $user->id)
-            ->where('day', strtolower($today))
-            ->exists();
+    $hadirHariIni = Attendance::whereDate('date', $today)
+        ->whereNotNull('check_in')
+        ->distinct('user_id')
+        ->count('user_id');
 
-        if($isScheduled){
+    // Grafik bulanan
+    $grafikRaw = Attendance::select(
+        DB::raw('MONTH(date) as bulan'),
+        DB::raw('COUNT(*) as total')
+    )
+        ->whereYear('date', now()->year)
+        ->groupBy('bulan')
+        ->pluck('total', 'bulan');
 
-            $sudahAbsen = Attendance::where('user_id', $user->id)
-                ->whereDate('date', now()->toDateString())
-                ->exists();
+    $grafikBulanan = [];
 
-            $jadwalHariIni[] = [
-                'name' => $user->name,
-                'work_group' => $user->work_group,
-                'status' => $sudahAbsen ? 'Sudah Absen' : 'Belum Absen'
-            ];
-        }
+    for ($i = 1; $i <= 12; $i++) {
+        $grafikBulanan[$i] = $grafikRaw[$i] ?? 0;
     }
 
-    return view('admin.dashboard', compact('jadwalHariIni'));
+    // Statistik bulan ini
+    $currentMonth = now()->month;
+    $currentYear = now()->year;
+
+    $totalHadirBulanIni = Attendance::whereMonth('date', $currentMonth)
+        ->whereYear('date', $currentYear)
+        ->whereNotNull('check_in')
+        ->count();
+
+    $totalTerlambatBulanIni = Attendance::whereMonth('date', $currentMonth)
+        ->whereYear('date', $currentYear)
+        ->where('status', 'like', '%Terlambat%')
+        ->count();
+
+    $totalBelumPulangHariIni = Attendance::whereDate('date', now())
+        ->whereNull('check_out')
+        ->count();
+
+    $totalPulangCepat = Attendance::whereMonth('date', $currentMonth)
+        ->whereYear('date', $currentYear)
+        ->where('status', 'like', '%Pulang Cepat%')
+        ->count();
+
+    // Ranking hadir
+    $rankingHadir = User::withCount(['attendances as total_hadir' => function ($q) {
+        $q->whereMonth('date', now()->month)
+          ->whereYear('date', now()->year)
+          ->whereNotNull('check_in');
+    }])
+        ->orderByDesc('total_hadir')
+        ->take(5)
+        ->get();
+
+    // Ranking terlambat
+    $rankingTerlambat = User::withCount(['attendances as total_terlambat' => function ($q) {
+        $q->whereMonth('date', now()->month)
+          ->whereYear('date', now()->year)
+          ->where('status', 'like', '%Terlambat%');
+    }])
+        ->orderByDesc('total_terlambat')
+        ->take(5)
+        ->get();
+
+    // Ranking jam kerja
+    $rankingJamKerja = DB::table('attendances')
+        ->join('users', 'attendances.user_id', '=', 'users.id')
+        ->select(
+            'users.name',
+            'users.id',
+            DB::raw('COUNT(attendances.id) as total_hadir'),
+            DB::raw('COALESCE(SUM(attendances.work_hours),0) as total_jam')
+        )
+        ->whereMonth('attendances.date', now()->month)
+        ->whereYear('attendances.date', now()->year)
+        ->groupBy('users.id', 'users.name')
+        ->orderByDesc('total_hadir')
+        ->orderByDesc('total_jam')
+        ->limit(5)
+        ->get();
+
+    $rankingSales = DB::table('attendances')
+    ->join('users', 'attendances.user_id', '=', 'users.id')
+    ->select(
+        'users.name',
+        'users.id',
+        DB::raw('COUNT(attendances.id) as total_hadir'),
+        DB::raw('COALESCE(SUM(attendances.work_hours),0) as total_jam')
+    )
+    ->where('users.work_group', 'sales')
+    ->whereMonth('attendances.date', now()->month)
+    ->whereYear('attendances.date', now()->year)
+    ->groupBy('users.id', 'users.name')
+    ->orderByDesc('total_hadir')
+    ->orderByDesc('total_jam')
+    ->limit(5)
+    ->get();
+
+$rankingOffice = DB::table('attendances')
+    ->join('users', 'attendances.user_id', '=', 'users.id')
+    ->select(
+        'users.name',
+        'users.id',
+        DB::raw('COUNT(attendances.id) as total_hadir'),
+        DB::raw('COALESCE(SUM(attendances.work_hours),0) as total_jam')
+    )
+    ->where('users.work_group', 'office')
+    ->whereMonth('attendances.date', now()->month)
+    ->whereYear('attendances.date', now()->year)
+    ->groupBy('users.id', 'users.name')
+    ->orderByDesc('total_hadir')
+    ->orderByDesc('total_jam')
+    ->limit(5)
+    ->get();
+
+    return view('admin.dashboard', compact(
+        'attendances',
+        'users',
+        'totalUsers',
+        'totalAbsensi',
+        'hadirHariIni',
+        'grafikBulanan',
+        'totalHadirBulanIni',
+        'totalTerlambatBulanIni',
+        'totalBelumPulangHariIni',
+        'rankingHadir',
+        'rankingTerlambat',
+        'rankingJamKerja',
+        'rankingSales',
+        'rankingOffice',
+        'totalPulangCepat'
+    ));
 }
 
 }
