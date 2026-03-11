@@ -225,6 +225,21 @@ public function dashboard(Request $request)
         ->where('status', 'like', '%Pulang Cepat%')
         ->count();
 
+    /// ===============================
+    // JADWAL PIKET HARI INI
+    // ===============================
+
+    $todayName = now()->format('l'); // contoh: Monday, Tuesday
+
+    $jadwalPiketHariIni = DB::table('user_work_days')
+    ->join('users', 'user_work_days.user_id', '=', 'users.id')
+    ->whereRaw('LOWER(user_work_days.day) = ?', [strtolower($todayName)])
+    ->select('users.id', 'users.name')
+    ->orderBy('users.name')
+    ->get();
+
+    $totalJadwalPiketHariIni = $jadwalPiketHariIni->count();
+
     // Ranking hadir
     $rankingHadir = User::withCount(['attendances as total_hadir' => function ($q) {
         $q->whereMonth('date', now()->month)
@@ -311,8 +326,33 @@ $rankingOffice = DB::table('attendances')
         'rankingJamKerja',
         'rankingSales',
         'rankingOffice',
+        'jadwalPiketHariIni',
+        'totalJadwalPiketHariIni',
         'totalPulangCepat'
     ));
+}
+
+public function jadwalPiketHariIni()
+{
+    $todayName = now()->format('l');
+    $todayDate = now()->format('Y-m-d');
+
+    $users = \DB::table('user_work_days')
+        ->join('users', 'user_work_days.user_id', '=', 'users.id')
+        ->leftJoin('attendances', function ($join) use ($todayDate) {
+            $join->on('users.id', '=', 'attendances.user_id')
+                 ->where('attendances.date', $todayDate);
+        })
+        ->whereRaw('LOWER(user_work_days.day) = ?', [strtolower($todayName)])
+        ->select(
+            'users.*',
+            'attendances.check_in',
+            'attendances.check_out'
+        )
+        ->orderBy('users.name')
+        ->get();
+
+    return view('admin.jadwal_piket_hari_ini', compact('users'));
 }
 
 }

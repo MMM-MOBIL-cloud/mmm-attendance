@@ -25,51 +25,51 @@
 </div>
 
     {{-- Statistik --}}
-    <div class="grid grid-cols-3 gap-6 mb-8">
-        <a href="{{ route('admin.users') }}">
+<div class="grid grid-cols-3 gap-6 mb-8">
 
-<div class="bg-blue-600 text-white p-6 rounded-xl shadow hover:scale-105 transition cursor-pointer">
-    <h2 class="text-lg">Total Users</h2>
-    <p class="text-3xl font-bold">{{ $totalUsers }}</p>
-</div>
-
-</a>
-
-        <div class="bg-green-600 text-white p-6 rounded-xl shadow">
-            <h2 class="text-lg">Total Absensi</h2>
-            <p class="text-3xl font-bold">{{ $totalAbsensi }}</p>
+    <!-- Total Users -->
+    <a href="{{ route('admin.users') }}">
+        <div class="bg-blue-600 text-white p-6 rounded-xl shadow">
+            <h3>Total Users</h3>
+            <p class="text-2xl font-bold">{{ $totalUsers }}</p>
         </div>
+    </a>
 
-        <a href="{{ route('admin.today') }}">
-
-<div class="bg-purple-600 text-white p-6 rounded-xl shadow hover:scale-105 transition cursor-pointer">
-    <h2 class="text-lg">Hadir Hari Ini</h2>
-    <p class="text-3xl font-bold">{{ $hadirHariIni }}</p>
-</div>
-
-</a>
- </div>
- <div class="grid grid-cols-3 gap-6 mt-6">
-
-    <div class="bg-green-500 text-white p-6 rounded-xl shadow">
-        <h3>Hadir Bulan Ini</h3>
-        <p class="text-2xl font-bold">
-            {{ $totalHadirBulanIni }}
-        </p>
+    <!-- Total Absensi -->
+    <div class="bg-green-600 text-white p-6 rounded-xl shadow">
+        <h3>Total Absensi</h3>
+        <p class="text-2xl font-bold">{{ $totalAbsensi }}</p>
     </div>
 
-    <div class="bg-red-500 text-white p-6 rounded-xl shadow">
-        <h3>Terlambat Bulan Ini</h3>
-        <p class="text-2xl font-bold">
-            {{ $totalTerlambatBulanIni }}
-        </p>
-    </div>
+    <!-- Hadir Hari Ini -->
+    <a href="{{ route('admin.today') }}">
+        <div class="bg-purple-600 text-white p-6 rounded-xl shadow">
+            <h3>Hadir Hari Ini</h3>
+            <p class="text-2xl font-bold">{{ $hadirHariIni }}</p>
+        </div>
+    </a>
+
+    <!-- Jadwal Piket -->
+<a href="{{ route('admin.jadwal.piket.hari.ini') }}">
 
     <div class="bg-yellow-500 text-white p-6 rounded-xl shadow">
-        <h3>Pulang Cepat</h3>
+        <h3>Jadwal Piket Hari Ini</h3>
         <p class="text-2xl font-bold">
-            {{ $totalPulangCepat }}
+            {{ $totalJadwalPiketHariIni }}
         </p>
+
+    </div>
+</a>
+    <!-- Hadir Bulan -->
+    <div class="bg-green-500 text-white p-6 rounded-xl shadow">
+        <h3>Hadir Bulan Ini</h3>
+        <p class="text-2xl font-bold">{{ $totalHadirBulanIni }}</p>
+    </div>
+
+    <!-- Terlambat -->
+    <div class="bg-red-500 text-white p-6 rounded-xl shadow">
+        <h3>Terlambat Bulan Ini</h3>
+        <p class="text-2xl font-bold">{{ $totalTerlambatBulanIni }}</p>
     </div>
 <a href="{{ route('admin.swap.index') }}"
 class="inline-flex items-center px-4 py-2 ml-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow text-sm font-semibold transition">
