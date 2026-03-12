@@ -142,10 +142,34 @@ public function updateUser(Request $request, $id)
 
     $user = User::findOrFail($id);
 
+    // ❗ tidak boleh nonaktifkan diri sendiri
+if (auth()->id() == $user->id && $request->is_active == 0) {
+    return back()->with('error', 'Anda tidak bisa menonaktifkan akun sendiri');
+}
+
+// ❗ tidak boleh nonaktifkan super admin
+if ($user->role === 'super_admin' && $request->is_active == 0) {
+    return back()->with('error', 'Super Admin tidak bisa dinonaktifkan');
+}
+
+// ❗ harus ada minimal 1 admin aktif
+if ($request->is_active == 0 && $user->role === 'admin') {
+
+    $activeAdmin = \App\Models\User::where('role','admin')
+    ->where('is_active',1)
+    ->where('id','!=',$user->id) // ⭐ penting
+    ->count();
+
+    if ($activeAdmin <= 1) {
+        return back()->with('error', 'Minimal harus ada 1 admin aktif');
+    }
+}
+
     $user->name = $request->name;
     $user->email = $request->email;
     $user->position = $request->position;
     $user->work_group = $request->work_group;
+    $user->is_active = $request->is_active;
 
     $user->can_swap_schedule = $request->has('can_swap_schedule');
     $user->can_approve_swap = $request->has('can_approve_swap');

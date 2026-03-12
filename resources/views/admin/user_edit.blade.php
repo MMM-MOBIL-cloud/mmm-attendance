@@ -7,6 +7,12 @@ Edit User - {{ $user->name }}
 </h1>
 
 {{-- FORM UPDATE USER --}}
+@if(session('error'))
+<div class="bg-red-500 text-white p-2 rounded mb-3">
+    {{ session('error') }}
+</div>
+@endif
+
 <form method="POST" action="{{ route('admin.user.update', $user->id) }}">
 @csrf
 
@@ -70,6 +76,14 @@ Sales
 </option>
 
 </select>
+</div>
+
+<div class="mt-4">
+    <label>Status User</label>
+    <select name="is_active" class="border rounded w-full px-3 py-2">
+        <option value="1" {{ $user->is_active ? 'selected' : '' }}>Aktif</option>
+        <option value="0" {{ !$user->is_active ? 'selected' : '' }}>Nonaktif</option>
+    </select>
 </div>
 
 <div class="mt-4">

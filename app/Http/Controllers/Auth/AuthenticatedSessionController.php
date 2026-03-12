@@ -23,17 +23,26 @@ class AuthenticatedSessionController extends Controller
      * Handle login.
      */
     public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
+{
+    $request->authenticate();
 
-        $request->session()->regenerate();
+    $request->session()->regenerate();
 
-        if (auth()->user()->role === 'admin') {
-            return redirect('/admin/dashboard');
-        }
+    // ⭐ block user nonaktif
+    if (!auth()->user()->is_active) {
+        auth()->logout();
 
-        return redirect('/dashboard');
+        return back()->withErrors([
+            'email' => 'Akun anda sudah tidak aktif. Hubungi admin.'
+        ]);
     }
+
+    if (auth()->user()->role === 'admin') {
+        return redirect('/admin/dashboard');
+    }
+
+    return redirect('/dashboard');
+}
 
     /**
      * Handle logout.
