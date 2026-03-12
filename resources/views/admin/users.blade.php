@@ -1,29 +1,32 @@
 <x-app-layout>
-<div class="p-6">
+<div class="p-4 sm:p-6 max-w-7xl mx-auto">
 
 <h1 class="text-2xl font-bold mb-6">Manajemen User</h1>
 
-<form method="POST" action="{{ route('admin.users.store') }}" class="bg-white p-6 rounded shadow mb-8">
+<!-- CARD FORM -->
+<div class="bg-white rounded-2xl shadow p-6 mb-8">
+
+<form method="POST" action="{{ route('admin.users.store') }}">
 @csrf
 
 <div class="grid grid-cols-2 gap-4">
 
 <div>
 <label class="text-sm text-gray-600">Nama</label>
-<input type="text" name="name" placeholder="Nama"
-class="border p-2 rounded w-full" required>
+<input type="text" name="name"
+class="border p-2 rounded w-full focus:ring focus:ring-blue-200" required>
 </div>
 
 <div>
 <label class="text-sm text-gray-600">Email</label>
-<input type="email" name="email" placeholder="Email"
-class="border p-2 rounded w-full" required>
+<input type="email" name="email"
+class="border p-2 rounded w-full focus:ring focus:ring-blue-200" required>
 </div>
 
 <div>
 <label class="text-sm text-gray-600">Password</label>
-<input type="password" name="password" placeholder="Password"
-class="border p-2 rounded w-full" required>
+<input type="password" name="password"
+class="border p-2 rounded w-full focus:ring focus:ring-blue-200" required>
 </div>
 
 <div>
@@ -38,29 +41,26 @@ class="border p-2 rounded w-full" required>
 <label class="text-sm text-gray-600">Jabatan</label>
 <select name="position" class="border p-2 rounded w-full">
 <option value="">Pilih Jabatan</option>
-<option value="Sales">Sales</option>
-<option value="Admin Office">Admin Office</option>
-<option value="Supervisor">Supervisor</option>
-<option value="Manager">Manager</option>
-<option value="Marketing">Marketing</option>
-<option value="Host Live">Host Live</option>
-<option value="Konten Kreator">Konten Kreator</option>
-<option value="Editor Konten">Editor Konten</option>
-<option value="Videographer/Photographer">Videographer/Photographer</option>
-<option value="Office Boy / Cleaning Service">Office Boy / Cleaning Service</option>
-<option value="Other">Other</option>
+<option>Sales</option>
+<option>Admin Office</option>
+<option>Supervisor</option>
+<option>Manager</option>
+<option>Marketing</option>
+<option>Host Live</option>
+<option>Konten Kreator</option>
+<option>Editor Konten</option>
+<option>Videographer/Photographer</option>
+<option>Office Boy / Cleaning Service</option>
+<option>Other</option>
 </select>
 </div>
 
 <div>
 <label class="text-sm text-gray-600">Work Group</label>
-
 <select name="work_group" class="border p-2 rounded w-full">
-
 <option value="">Pilih Work Group</option>
 <option value="office">Office</option>
 <option value="sales">Sales</option>
-
 </select>
 </div>
 
@@ -77,42 +77,69 @@ class="border p-2 rounded w-full">
 </div>
 
 </div>
-    <div class="col-span-2 mt-2">
-<label class="font-semibold">Jadwal Hari Kerja</label>
 
-<div class="grid grid-cols-4 gap-2 mt-2 text-sm">
+<!-- JADWAL -->
+<div class="mt-4">
+<label class="font-semibold block mb-2">Jadwal Hari Kerja</label>
 
-<label><input type="checkbox" name="work_days[]" value="Monday"> Senin</label>
-<label><input type="checkbox" name="work_days[]" value="Tuesday"> Selasa</label>
-<label><input type="checkbox" name="work_days[]" value="Wednesday"> Rabu</label>
-<label><input type="checkbox" name="work_days[]" value="Thursday"> Kamis</label>
-<label><input type="checkbox" name="work_days[]" value="Friday"> Jumat</label>
-<label><input type="checkbox" name="work_days[]" value="Saturday"> Sabtu</label>
-<label><input type="checkbox" name="work_days[]" value="Sunday"> Minggu</label>
+<div class="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+
+<div class="space-y-2">
+<label class="flex items-center gap-2">
+<input type="checkbox" name="work_days[]" value="Monday"> Senin
+</label>
+
+<label class="flex items-center gap-2">
+<input type="checkbox" name="work_days[]" value="Tuesday"> Selasa
+</label>
+
+<label class="flex items-center gap-2">
+<input type="checkbox" name="work_days[]" value="Wednesday"> Rabu
+</label>
+
+<label class="flex items-center gap-2">
+<input type="checkbox" name="work_days[]" value="Thursday"> Kamis
+</label>
+</div>
+
+<div class="space-y-2">
+<label class="flex items-center gap-2">
+<input type="checkbox" name="work_days[]" value="Friday"> Jumat
+</label>
+
+<label class="flex items-center gap-2">
+<input type="checkbox" name="work_days[]" value="Saturday"> Sabtu
+</label>
+
+<label class="flex items-center gap-2">
+<input type="checkbox" name="work_days[]" value="Sunday"> Minggu
+</label>
+</div>
 
 </div>
 </div>
 
-
-<button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
+<button class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
 Tambah User
 </button>
 
 </form>
-<form action="{{ route('admin.export.user') }}" method="GET" class="bg-white p-4 rounded shadow mb-6 flex gap-3 items-center">
+</div>
 
-<select name="user_id" class="border p-2 rounded" required>
+<!-- CARD EXPORT -->
+<div class="bg-white p-4 rounded-2xl shadow mb-6 overflow-x-auto">
+
+<form action="{{ route('admin.export.user') }}" method="GET"
+class="flex flex-col md:flex-row gap-3 md:items-center">
+
+<select name="user_id" class="border p-2 rounded w-full md:w-auto" required>
 <option value="">Pilih User</option>
-
 @foreach($users as $user)
-<option value="{{ $user->id }}">
-{{ $user->name }}
-</option>
+<option value="{{ $user->id }}">{{ $user->name }}</option>
 @endforeach
-
 </select>
 
-<select name="month" class="border p-2 rounded" required>
+<select name="month" class="border p-2 rounded w-full md:w-auto" required>
 <option value="">Pilih Bulan</option>
 <option value="1">Januari</option>
 <option value="2">Februari</option>
@@ -128,22 +155,28 @@ Tambah User
 <option value="12">Desember</option>
 </select>
 
-<select name="year" class="border p-2 rounded">
-<option value="{{ now()->year }}">{{ now()->year }}</option>
-<option value="{{ now()->year - 1 }}">{{ now()->year - 1 }}</option>
+<select name="year" class="border p-2 rounded w-full md:w-auto">
+<option>{{ now()->year }}</option>
+<option>{{ now()->year - 1 }}</option>
 </select>
 
-<button class="bg-green-600 text-white px-4 py-2 rounded">
+<button class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg">
 Export Absensi
 </button>
 
 </form>
-<h2 class="text-xl font-bold mt-8 mb-4">Daftar User</h2>
+</div>
 
-<table class="min-w-full bg-white shadow rounded">
+<!-- TABLE USER -->
+<h2 class="text-xl font-bold mb-3">Daftar User</h2>
 
-<thead>
-<tr class="bg-gray-100 text-center">
+<div class="bg-white shadow rounded-2xl overflow-hidden">
+
+<div class="overflow-x-auto">
+<table class="min-w-[900px] w-full">
+
+<thead class="bg-gray-100 text-sm">
+<tr class="text-center">
 <th class="p-3">Nama</th>
 <th class="p-3">Email</th>
 <th class="p-3">Role</th>
@@ -160,31 +193,20 @@ Export Absensi
 <tr class="border-t text-center hover:bg-gray-50 cursor-pointer"
 onclick="window.location='{{ route('admin.user.edit', $user->id) }}'">
 
-<td class="p-3">
-<a href="{{ route('admin.user.edit', $user->id) }}"
-class="text-blue-600 hover:underline font-semibold">
+<td class="p-3 text-blue-600 font-semibold">
 {{ $user->name }}
-</a>
 </td>
 
 <td class="p-3">
 {{ $user->email }}
 </td>
 
-<td class="p-3">
+<td class="p-3 capitalize">
 {{ $user->role }}
 </td>
 
 <td class="p-3">
-
-<div class="flex items-center justify-center gap-2">
-
-<span>
 {{ $user->position ?? '-' }}
-</span>
-
-</div>
-
 </td>
 
 <td class="p-3 capitalize">
@@ -192,12 +214,10 @@ class="text-blue-600 hover:underline font-semibold">
 </td>
 
 <td class="p-3">
-
 <a href="{{ route('admin.user.schedule', $user->id) }}"
 class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">
 Atur Jadwal
 </a>
-
 </td>
 
 </tr>
@@ -207,5 +227,9 @@ Atur Jadwal
 </tbody>
 
 </table>
+</div>
+
+</div>
+
 </div>
 </x-app-layout>
