@@ -134,20 +134,33 @@ public function editUser($id)
 
 public function updateUser(Request $request, $id)
 {
+    $request->validate([
+        'name' => 'required',
+        'email' => 'required|email',
+        'password' => 'nullable|min:6'
+    ]);
+
     $user = User::findOrFail($id);
 
-    $user->update([
-    'position' => $request->position,
-    'work_group' => $request->work_group,
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->position = $request->position;
+    $user->work_group = $request->work_group;
 
-    'can_swap_schedule' => $request->has('can_swap_schedule'),
-    'can_approve_swap' => $request->has('can_approve_swap'),
-    'can_student_leave' => $request->has('can_student_leave'),
-    'can_general_leave' => $request->has('can_general_leave'),
-]);
+    $user->can_swap_schedule = $request->has('can_swap_schedule');
+    $user->can_approve_swap = $request->has('can_approve_swap');
+    $user->can_student_leave = $request->has('can_student_leave');
+    $user->can_general_leave = $request->has('can_general_leave');
+
+    // ⭐ INI YANG PALING PENTING
+    if ($request->filled('password')) {
+        $user->password = Hash::make($request->password);
+    }
+
+    $user->save();
 
     return redirect()->route('admin.users')
-        ->with('success','Data user berhasil diupdate');
+        ->with('success', 'Data user berhasil diupdate');
 }
 
 public function deleteUser($id)

@@ -72,6 +72,16 @@ Sales
 </select>
 </div>
 
+<div class="mt-4">
+    <label>Password Baru</label>
+    <input type="password" name="password" class="border rounded w-full px-3 py-2">
+</div>
+
+<div class="mt-4">
+    <label>Konfirmasi Password</label>
+    <input type="password" name="password_confirmation" class="border rounded w-full px-3 py-2">
+</div>
+
 <div class="mb-6">
 
 <label class="block font-semibold mb-2">Akses Fitur</label>
