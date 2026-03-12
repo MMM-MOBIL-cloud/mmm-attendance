@@ -182,6 +182,7 @@ Export Absensi
 <th class="p-3">Role</th>
 <th class="p-3">Jabatan</th>
 <th class="p-3">Work Group</th>
+<th class="p-3">Status</th>
 <th class="p-3">Action</th>
 </tr>
 </thead>
@@ -211,6 +212,20 @@ onclick="window.location='{{ route('admin.user.edit', $user->id) }}'">
 
 <td class="p-3 capitalize">
 {{ $user->work_group ?? '-' }}
+</td>
+
+<td>
+<form action="{{ route('admin.users.toggleStatus', $user->id) }}" method="POST">
+@csrf
+@method('PATCH')
+
+<button type="submit"
+class="px-3 py-1 rounded text-white
+{{ $user->is_active ? 'bg-green-500' : 'bg-red-500' }}">
+    {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
+</button>
+
+</form>
 </td>
 
 <td class="p-3">

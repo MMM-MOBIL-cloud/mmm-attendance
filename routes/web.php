@@ -199,6 +199,9 @@ Route::post('/admin/users/{id}/update', [AdminController::class, 'updateUser'])
 Route::delete('/admin/users/{id}/delete', [AdminController::class, 'deleteUser'])
     ->name('admin.user.delete');
 
+Route::patch('/admin/users/{id}/toggle-status', [AdminController::class,'toggleStatus'])
+    ->name('admin.users.toggleStatus');
+
 });
 
 require __DIR__.'/auth.php';

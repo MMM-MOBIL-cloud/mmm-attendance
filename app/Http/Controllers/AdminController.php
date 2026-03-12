@@ -187,6 +187,40 @@ if ($request->is_active == 0 && $user->role === 'admin') {
         ->with('success', 'Data user berhasil diupdate');
 }
 
+public function toggleStatus($id)
+{
+    $user = \App\Models\User::findOrFail($id);
+
+    // ❗ tidak boleh ubah status akun sendiri
+    if (auth()->id() == $user->id) {
+        return back()->with('error','Tidak bisa ubah status akun sendiri');
+    }
+
+    // ❗ super admin tidak boleh diubah
+    if ($user->role === 'super_admin') {
+        return back()->with('error','Status Super Admin tidak bisa diubah');
+    }
+
+    // ❗ minimal harus ada 1 admin aktif
+    if ($user->role === 'admin' && $user->is_active) {
+
+        $activeAdmin = \App\Models\User::where('role','admin')
+            ->where('is_active',1)
+            ->where('id','!=',$user->id)
+            ->count();
+
+        if ($activeAdmin < 1) {
+            return back()->with('error','Minimal harus ada 1 admin aktif');
+        }
+    }
+
+    // ⭐ TOGGLE STATUS
+    $user->is_active = !$user->is_active;
+    $user->save();
+
+    return back()->with('success','Status user berhasil diubah');
+}
+
 public function deleteUser($id)
 {
     $user = User::findOrFail($id);
