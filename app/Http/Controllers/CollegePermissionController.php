@@ -48,7 +48,9 @@ class CollegePermissionController extends Controller
         $query->whereYear('date', $request->year);
     }
 
-    $permissions = $query->latest()->get();
+    $permissions = $query->latest()
+                         ->paginate(10)
+                         ->withQueryString();
 
     return view('admin.college_permissions.index', compact('permissions'));
 }
