@@ -6,7 +6,9 @@
 Approval Tukar Jadwal
 </h1>
 
-<table class="w-full border border-gray-300">
+<div class="overflow-x-auto">
+
+<table class="min-w-full bg-white shadow rounded">
 
 <thead class="bg-gray-100">
 
