@@ -15,6 +15,9 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ScheduleSwapController;
 use App\Http\Controllers\CollegePermissionController;
 use App\Http\Controllers\GeneralLeaveController;
+use App\Http\Controllers\HolidayController;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +95,25 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/jadwal-piket-hari-ini',
     [AdminController::class,'jadwalPiketHariIni']
     )->name('admin.jadwal.piket.hari.ini');
+
+    // =========================
+    // HOLIDAYS MANAGEMENT
+    // =========================
+
+    Route::get('/admin/holidays', [HolidayController::class,'index'])
+        ->name('admin.holidays');
+
+    Route::post('/admin/holidays/store', [HolidayController::class,'store'])
+        ->name('admin.holidays.store');
+
+    Route::delete('/admin/holidays/{id}', [HolidayController::class,'delete'])
+        ->name('admin.holidays.delete');
+
+    // AJAX dari kalender
+    Route::post('/admin/calendar/store', [HolidayController::class,'storeAjax'])
+        ->name('admin.calendar.store');
+
+});
 
     // ========================
     // ADMIN IZIN KULIAH
@@ -201,6 +223,69 @@ Route::delete('/admin/users/{id}/delete', [AdminController::class, 'deleteUser']
 
 Route::patch('/admin/users/{id}/toggle-status', [AdminController::class,'toggleStatus'])
     ->name('admin.users.toggleStatus');
+
+Route::get('/admin/calendar-events', function () {
+
+        $events = [];
+
+        $workDays = \App\Models\UserWorkDay::with('user')->get();
+
+        $start = Carbon::now()->startOfMonth();
+        $end = Carbon::now()->endOfMonth();
+
+        foreach ($workDays as $wd) {
+
+            $date = $start->copy();
+
+            while ($date <= $end) {
+
+                if ($date->format('l') == $wd->day) {
+
+                    $events[] = [
+                        'title' => 'Piket '.$wd->user->name,
+                        'start' => $date->format('Y-m-d'),
+                        'color' => '#22c55e'
+                    ];
+                }
+
+                $date->addDay();
+            }
+        }
+        $holidays = DB::table('holidays')->get();
+
+foreach ($holidays as $h) {
+    $events[] = [
+        'title' => $h->title,
+        'start' => $h->date,
+        'color' => '#ef4444'
+    ];
+}
+
+        return response()->json($events);
+});
+
+Route::get('/admin/sync-holidays', function () {
+
+    $year = now()->year;
+
+    $json = file_get_contents("https://date.nager.at/api/v3/PublicHolidays/".$year."/ID");
+
+    $data = json_decode($json, true);
+
+    foreach ($data as $h) {
+
+        DB::table('holidays')->updateOrInsert(
+            ['date' => $h['date']],
+            [
+                'title' => $h['localName'],
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        );
+
+    }
+
+    return "Sync libur nasional berhasil 👍";
 
 });
 

@@ -182,59 +182,72 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
 @endforeach
 </div>
 
-<div class="bg-white p-5 rounded-xl shadow mt-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
-<h3 class="font-semibold mb-4 text-blue-600">
-🏆 Ranking Sales (Hadir + Jam Kerja)
-</h3>
+    {{-- Ranking Sales & Office --}}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 
-@foreach($rankingSales as $index => $user)
+    {{-- Ranking Sales --}}
+    <div class="bg-white p-5 rounded-xl shadow">
+        <h3 class="font-semibold mb-4 text-blue-600">
+            🏆 Ranking Sales Paling Rajin (Hadir + Jam Kerja)
+        </h3>
 
-<div class="flex justify-between border-b py-2">
+        @foreach($rankingSales as $index => $user)
+        <div class="flex justify-between border-b py-2">
+            <span class="text-gray-600">
+                #{{ $index + 1 }} {{ $user->name }}
+            </span>
 
-<span class="text-gray-600">
-#{{ $index + 1 }} {{ $user->name }}
-</span>
-
-<span class="text-blue-600 font-semibold">
-{{ $user->total_hadir }} hari | {{ round($user->total_jam,2) }} jam
-</span>
-
-</div>
-
-@endforeach
-
-</div>
-
-<div class="bg-white p-5 rounded-xl shadow mt-6">
-
-<h3 class="font-semibold mb-4 text-green-600">
-🏆 Ranking Office (Hadir + Jam Kerja)
-</h3>
-
-@foreach($rankingOffice as $index => $user)
-
-<div class="flex justify-between border-b py-2">
-
-<span class="text-gray-600">
-#{{ $index + 1 }} {{ $user->name }}
-</span>
-
-<span class="text-green-600 font-semibold">
-{{ $user->total_hadir }} hari | {{ round($user->total_jam,2) }} jam
-</span>
-
-</div>
-
-@endforeach
-
-</div>
-
-    {{-- Grafik --}}
-    <div class="bg-white p-6 rounded-xl shadow mb-8">
-    <div style="height:300px">
-        <canvas id="grafikAbsensi"></canvas>
+            <span class="text-blue-600 font-semibold">
+                {{ $user->total_hadir }} hari |
+                {{ round($user->total_jam,2) }} jam
+            </span>
+        </div>
+        @endforeach
     </div>
+
+    {{-- Ranking Office --}}
+    <div class="bg-white p-5 rounded-xl shadow">
+        <h3 class="font-semibold mb-4 text-green-600">
+            🏆 Ranking Office Paling Rajin (Hadir + Jam Kerja)
+        </h3>
+
+        @foreach($rankingOffice as $index => $user)
+        <div class="flex justify-between border-b py-2">
+            <span class="text-gray-600">
+                #{{ $index + 1 }} {{ $user->name }}
+            </span>
+
+            <span class="text-green-600 font-semibold">
+                {{ $user->total_hadir }} hari |
+                {{ round($user->total_jam,2) }} jam
+            </span>
+        </div>
+        @endforeach
+    </div>
+
+</div>
+
+    {{-- Kalender --}}
+    <div class="bg-white p-6 rounded-xl shadow mt-8">
+
+    <div class="flex justify-between items-center mb-4">
+
+<h2 class="text-xl font-bold">
+📅 Jadwal Karyawan
+</h2>
+
+<a href="{{ route('admin.holidays') }}"
+       class="bg-blue-600 hover:bg-indigo-700 text-white
+              px-4 py-2 rounded-lg shadow-lg z-50 relative">
+        ⚙️ Kelola Libur
+    </a>
+
+</div>
+
+    <div id="calendar"></div>
+
 </div>
 
 <div style="display:flex; gap:20px; margin-bottom:20px;">
@@ -611,5 +624,98 @@ Reset
         }
     });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        height: 650,
+        events: '/admin/calendar-events',
+        dayMaxEvents: true,
+
+        dateClick: function(info) {
+
+    document.getElementById('modalLibur').style.display = 'flex';
+
+    document.getElementById('tanggalDipilih').value = info.dateStr;
+
+},
+    });
+
+    calendar.render();
+
+});
+
+function tutupModal(){
+    document.getElementById('modalLibur').style.display = 'none';
+}
+
+function simpanLibur(){
+
+    fetch('/admin/calendar/store', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            title: document.getElementById('judulLibur').value,
+            date: document.getElementById('tanggalDipilih').value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.success){
+
+            alert('Libur berhasil ditambahkan');
+
+            document.getElementById('modalLibur').style.display='none';
+
+            location.reload();
+
+        }else{
+            alert('Gagal menyimpan');
+        }
+
+    });
+
+}
+</script>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<!-- Modal Tambah Libur -->
+<div id="modalLibur" style="display:none;
+position:fixed; top:0; left:0; right:0; bottom:0;
+background:rgba(0,0,0,0.5);
+align-items:center; justify-content:center; z-index:9999;">
+
+    <div style="background:white; padding:20px; border-radius:10px; width:350px;">
+        <h3 style="font-weight:bold; margin-bottom:10px;">Tambah Event</h3>
+
+        <form id="formLibur" method="POST" onsubmit="return false;">
+            <input type="hidden" id="tanggalDipilih">
+
+            <label>Judul</label>
+            <input type="text" id="judulLibur"
+                   style="width:100%; border:1px solid #ddd; padding:8px; border-radius:6px; margin-bottom:10px">
+
+            <button type="button" onclick="simpanLibur()"
+                    style="background:#22c55e; color:white; padding:8px 12px; border:none; border-radius:6px;">
+                Simpan
+            </button>
+
+            <button type="button" onclick="tutupModal()"
+                    style="background:#ef4444; color:white; padding:8px 12px; border:none; border-radius:6px;">
+                Batal
+            </button>
+        </form>
+    </div>
+</div>
 
 </x-app-layout>

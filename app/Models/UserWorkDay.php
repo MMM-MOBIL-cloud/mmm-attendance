@@ -12,4 +12,9 @@ class UserWorkDay extends Model
         'user_id',
         'day'
     ];
+
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }
