@@ -232,8 +232,10 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
 
     {{-- Grafik --}}
     <div class="bg-white p-6 rounded-xl shadow mb-8">
+    <div style="height:300px">
         <canvas id="grafikAbsensi"></canvas>
     </div>
+</div>
 
 <div style="display:flex; gap:20px; margin-bottom:20px;">
 
@@ -370,24 +372,28 @@ Reset
         {{-- CHECKOUT TYPE --}}
        <td class="p-3">
 
-@php
-$type = strtolower(trim($attendance->checkout_type ?? ''));
-@endphp
-
-@if($type == 'auto')
-
-<span style="background:#f97316;color:white;padding:3px 10px;border-radius:9999px;font-size:12px;">
-AUTO
-</span>
-
-@elseif($type == 'manual')
-
-<span style="background:#3b82f6;color:white;padding:3px 10px;border-radius:9999px;font-size:12px;">
-MANUAL
-</span>
-
+@if(!$attendance->check_out)
+    -
 @else
--
+
+    @php
+        $type = strtolower(trim($attendance->checkout_type ?? ''));
+    @endphp
+
+    @if($type == 'auto')
+        <span style="background:#f97316;color:white;padding:3px 10px;border-radius:9999px;font-size:12px;">
+            AUTO
+        </span>
+
+    @elseif($type == 'manual')
+        <span style="background:#3b82f6;color:white;padding:3px 10px;border-radius:9999px;font-size:12px;">
+            MANUAL
+        </span>
+
+    @else
+        -
+    @endif
+
 @endif
 
 </td>
