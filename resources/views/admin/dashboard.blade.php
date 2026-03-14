@@ -194,13 +194,32 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
             </h3>
 
             @foreach($rankingOffice as $index => $user)
-                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
-                    <span>#{{ $index+1 }} {{ $user->name }}</span>
+
+                @php
+                $bg = '';
+                if($index == 0) $bg = 'bg-yellow-100 border border-yellow-400';
+                elseif($index == 1) $bg = 'bg-gray-100 border border-gray-400';
+                elseif($index == 2) $bg = 'bg-orange-100 border border-orange-400';
+                @endphp
+
+                <div class="flex justify-between border-b py-2 px-2 rounded text-xs lg:text-sm {{ $bg }}">
+
+                    <span>
+                        @if($index == 0) 🥇
+                        @elseif($index == 1) 🥈
+                        @elseif($index == 2) 🥉
+                        @endif
+
+                        #{{ $index + 1 }} {{ $user->name }}
+                    </span>
+
                     <span class="text-green-600 font-semibold">
                         {{ $user->total_hadir }}h | {{ round($user->total_jam,1) }}j
                     </span>
+
                 </div>
-            @endforeach
+
+                @endforeach
         </div>
 
         {{-- Office Terlambat --}}
@@ -233,8 +252,24 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
             </h3>
 
             @foreach($rankingSales as $index => $user)
-                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
-                    <span>#{{ $index+1 }} {{ $user->name }}</span>
+
+                @php
+                $bg = '';
+                if($index == 0) $bg = 'bg-yellow-100 border border-yellow-400';
+                elseif($index == 1) $bg = 'bg-gray-100 border border-gray-400';
+                elseif($index == 2) $bg = 'bg-orange-100 border border-orange-400';
+                @endphp
+
+                <div class="flex justify-between border-b py-2 px-2 rounded text-xs lg:text-sm {{ $bg }}">
+
+                    <span>
+                        @if($index == 0) 🥇
+                        @elseif($index == 1) 🥈
+                        @elseif($index == 2) 🥉
+                        @endif
+
+                        #{{ $index + 1 }} {{ $user->name }}
+                    </span>
                     <span class="text-blue-600 font-semibold">
                         {{ $user->total_hadir }}h | {{ round($user->total_jam,1) }}j
                     </span>

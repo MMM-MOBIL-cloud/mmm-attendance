@@ -238,6 +238,7 @@ if ($distance > $radius) {
         'photo' => $photoPath,
         'latitude'  => $userLat,
         'longitude' => $userLng,
+        'work_group' => auth()->user()->work_group,
     ]);
 
     return back()->with('success', 'Check-in berhasil.');

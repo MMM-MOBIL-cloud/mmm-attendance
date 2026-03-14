@@ -349,34 +349,40 @@ public function dashboard(Request $request)
         ->get();
 
     $rankingSales = DB::table('attendances')
-    ->join('users', 'attendances.user_id', '=', 'users.id')
+    ->join('users', 'attendances.user_id','=','users.id')
+
+    ->where('users.is_active', 1)
+    ->where('attendances.work_group','sales')   // ⭐ WAJIB INI
+    ->whereMonth('attendances.date', now()->month)
+    ->whereYear('attendances.date', now()->year)
+
     ->select(
         'users.name',
         'users.id',
         DB::raw('COUNT(attendances.id) as total_hadir'),
         DB::raw('COALESCE(SUM(attendances.work_hours),0) as total_jam')
     )
-    ->where('users.work_group', 'sales')
-    ->whereMonth('attendances.date', now()->month)
-    ->whereYear('attendances.date', now()->year)
-    ->groupBy('users.id', 'users.name')
+    ->groupBy('users.id','users.name')
     ->orderByDesc('total_hadir')
     ->orderByDesc('total_jam')
     ->limit(5)
     ->get();
 
 $rankingOffice = DB::table('attendances')
-    ->join('users', 'attendances.user_id', '=', 'users.id')
+    ->join('users', 'attendances.user_id','=','users.id')
+
+    ->where('users.is_active', 1)
+    ->where('attendances.work_group','office')   // ⭐ WAJIB
+    ->whereMonth('attendances.date', now()->month)
+    ->whereYear('attendances.date', now()->year)
+
     ->select(
         'users.name',
         'users.id',
         DB::raw('COUNT(attendances.id) as total_hadir'),
         DB::raw('COALESCE(SUM(attendances.work_hours),0) as total_jam')
     )
-    ->where('users.work_group', 'office')
-    ->whereMonth('attendances.date', now()->month)
-    ->whereYear('attendances.date', now()->year)
-    ->groupBy('users.id', 'users.name')
+    ->groupBy('users.id','users.name')
     ->orderByDesc('total_hadir')
     ->orderByDesc('total_jam')
     ->limit(5)
@@ -386,7 +392,8 @@ $rankingOfficeLate = Attendance::whereMonth('date', now()->month)
     ->whereYear('date', now()->year)
     ->where('status', 'like', '%Terlambat%')
     ->whereHas('user', function ($q) {
-        $q->where('work_group', 'office');
+        $q->where('work_group', 'office')
+        ->where('is_active', 1);
     })
     ->get()
     ->groupBy('user_id')
@@ -415,7 +422,8 @@ $rankingSalesLate = Attendance::whereMonth('date', now()->month)
     ->whereYear('date', now()->year)
     ->where('status', 'like', '%Terlambat%')
     ->whereHas('user', function ($q) {
-        $q->where('work_group', 'sales');
+        $q->where('work_group', 'sales')
+        ->where('is_active', 1);
     })
     ->get()
     ->groupBy('user_id')
