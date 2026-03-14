@@ -382,6 +382,64 @@ $rankingOffice = DB::table('attendances')
     ->limit(5)
     ->get();
 
+$rankingOfficeLate = Attendance::whereMonth('date', now()->month)
+    ->whereYear('date', now()->year)
+    ->where('status', 'like', '%Terlambat%')
+    ->whereHas('user', function ($q) {
+        $q->where('work_group', 'office');
+    })
+    ->get()
+    ->groupBy('user_id')
+    ->map(function ($items) {
+
+        $totalDays = $items->count();
+
+        $totalLateMinutes = $items->sum(function ($att) {
+            return $att->late_minutes;
+        });
+
+        return [
+            'user' => $items->first()->user,
+            'days' => $totalDays,
+            'hours' => floor($totalLateMinutes / 60),
+            'minutes' => $totalLateMinutes % 60,
+        ];
+    })
+    ->sortByDesc(function ($item) {
+    return $item['days'] * 10000 + ($item['hours'] * 60 + $item['minutes']);
+})
+    ->values()
+    ->take(5);
+
+$rankingSalesLate = Attendance::whereMonth('date', now()->month)
+    ->whereYear('date', now()->year)
+    ->where('status', 'like', '%Terlambat%')
+    ->whereHas('user', function ($q) {
+        $q->where('work_group', 'sales');
+    })
+    ->get()
+    ->groupBy('user_id')
+    ->map(function ($items) {
+
+        $totalDays = $items->count();
+
+        $totalLateMinutes = $items->sum(function ($att) {
+            return $att->late_minutes;
+        });
+
+        return [
+            'user' => $items->first()->user,
+            'days' => $totalDays,
+            'hours' => floor($totalLateMinutes / 60),
+            'minutes' => $totalLateMinutes % 60,
+        ];
+    })
+    ->sortByDesc(function ($item) {
+    return $item['days'] * 10000 + ($item['hours'] * 60 + $item['minutes']);
+})
+    ->values()
+    ->take(5);
+
     return view('admin.dashboard', compact(
         'attendances',
         'users',
@@ -397,6 +455,8 @@ $rankingOffice = DB::table('attendances')
         'rankingJamKerja',
         'rankingSales',
         'rankingOffice',
+        'rankingOfficeLate',
+        'rankingSalesLate',
         'jadwalPiketHariIni',
         'totalJadwalPiketHariIni',
         'totalPulangCepat'

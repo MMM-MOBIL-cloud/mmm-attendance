@@ -182,49 +182,83 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
 @endforeach
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+<div class="space-y-6 mt-6">
 
-    {{-- Ranking Sales & Office --}}
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    {{-- ROW OFFICE --}}
+    <div class="grid grid-cols-2 gap-4">
 
-    {{-- Ranking Sales --}}
-    <div class="bg-white p-5 rounded-xl shadow">
-        <h3 class="font-semibold mb-4 text-blue-600">
-            🏆 Ranking Sales Paling Rajin (Hadir + Jam Kerja)
-        </h3>
+        {{-- Office Rajin --}}
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-semibold mb-3 text-green-600 text-sm lg:text-base">
+                🏆 Office Rajin
+            </h3>
 
-        @foreach($rankingSales as $index => $user)
-        <div class="flex justify-between border-b py-2">
-            <span class="text-gray-600">
-                #{{ $index + 1 }} {{ $user->name }}
-            </span>
-
-            <span class="text-blue-600 font-semibold">
-                {{ $user->total_hadir }} hari |
-                {{ round($user->total_jam,2) }} jam
-            </span>
+            @foreach($rankingOffice as $index => $user)
+                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
+                    <span>#{{ $index+1 }} {{ $user->name }}</span>
+                    <span class="text-green-600 font-semibold">
+                        {{ $user->total_hadir }}h | {{ round($user->total_jam,1) }}j
+                    </span>
+                </div>
+            @endforeach
         </div>
-        @endforeach
+
+        {{-- Office Terlambat --}}
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-semibold mb-3 text-red-600 text-sm lg:text-base">
+                ⚠ Office Terlambat
+            </h3>
+
+            @foreach($rankingOfficeLate as $index => $item)
+                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
+                    <span>#{{ $index+1 }} {{ $item['user']->name }}</span>
+                    <span class="text-red-600 font-semibold">
+                            {{ $item['days'] }}h |
+                            {{ round(($item['hours'] + ($item['minutes'] / 60)),1) }}j
+                    </span>
+                </div>
+            @endforeach
+        </div>
+
     </div>
 
-    {{-- Ranking Office --}}
-    <div class="bg-white p-5 rounded-xl shadow">
-        <h3 class="font-semibold mb-4 text-green-600">
-            🏆 Ranking Office Paling Rajin (Hadir + Jam Kerja)
-        </h3>
 
-        @foreach($rankingOffice as $index => $user)
-        <div class="flex justify-between border-b py-2">
-            <span class="text-gray-600">
-                #{{ $index + 1 }} {{ $user->name }}
-            </span>
+    {{-- ROW SALES --}}
+    <div class="grid grid-cols-2 gap-4">
 
-            <span class="text-green-600 font-semibold">
-                {{ $user->total_hadir }} hari |
-                {{ round($user->total_jam,2) }} jam
-            </span>
+        {{-- Sales Rajin --}}
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-semibold mb-3 text-blue-600 text-sm lg:text-base">
+                🏆 Sales Rajin
+            </h3>
+
+            @foreach($rankingSales as $index => $user)
+                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
+                    <span>#{{ $index+1 }} {{ $user->name }}</span>
+                    <span class="text-blue-600 font-semibold">
+                        {{ $user->total_hadir }}h | {{ round($user->total_jam,1) }}j
+                    </span>
+                </div>
+            @endforeach
         </div>
-        @endforeach
+
+        {{-- Sales Terlambat --}}
+        <div class="bg-white p-4 rounded-xl shadow">
+            <h3 class="font-semibold mb-3 text-red-600 text-sm lg:text-base">
+                ⚠ Sales Terlambat
+            </h3>
+
+            @foreach($rankingSalesLate as $index => $item)
+                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
+                    <span>#{{ $index+1 }} {{ $item['user']->name }}</span>
+                    <span class="text-red-600 font-semibold">
+                            {{ $item['days'] }}h |
+                            {{ round(($item['hours'] + ($item['minutes'] / 60)),1) }}j
+                    </span>
+                </div>
+            @endforeach
+        </div>
+
     </div>
 
 </div>

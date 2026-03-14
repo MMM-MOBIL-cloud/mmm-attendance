@@ -54,4 +54,22 @@ class Attendance extends Model
             $this->calculateDistance($this->latitude, $this->longitude)
         );
     }
+
+    public function getLateMinutesAttribute()
+    {
+    if (!$this->check_in) {
+        return 0;
+    }
+
+    $checkIn = \Carbon\Carbon::parse($this->check_in);
+
+    // batas telat kantor MMM = 08:15
+    $batas = \Carbon\Carbon::createFromTime(8, 15, 0);
+
+    if ($checkIn->lte($batas)) {
+        return 0;
+    }
+
+    return $batas->diffInMinutes($checkIn);
+    }
 }
