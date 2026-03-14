@@ -102,56 +102,7 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
 </a>
 
 </div>
-</div>
 
-    <div class="grid grid-cols-2 gap-6 mb-8">
-
-    <!-- Ranking Rajin -->
-    <div class="bg-white p-5 rounded-xl shadow">
-        <h3 class="font-semibold mb-4 text-green-600">
-            🏆 Ranking Paling Rajin
-        </h3>
-
-        @foreach($rankingHadir as $index => $user)
-            <div class="flex justify-between items-center border-b py-2">
-                <div class="flex items-center gap-2">
-                    <span class="font-bold text-gray-400">
-                        #{{ $index + 1 }}
-                    </span>
-                    <span>{{ $user->name }}</span>
-                </div>
-
-                <span class="font-semibold text-green-600">
-                    {{ $user->total_hadir }} hari
-                </span>
-            </div>
-        @endforeach
-    </div>
-
-
-    <!-- Ranking Terlambat -->
-    <div class="bg-white p-5 rounded-xl shadow">
-        <h3 class="font-semibold mb-4 text-red-600">
-            ⚠️ Ranking Paling Sering Terlambat
-        </h3>
-
-        @foreach($rankingTerlambat as $index => $user)
-            <div class="flex justify-between items-center border-b py-2">
-                <div class="flex items-center gap-2">
-                    <span class="font-bold text-gray-400">
-                        #{{ $index + 1 }}
-                    </span>
-                    <span>{{ $user->name }}</span>
-                </div>
-
-                <span class="font-semibold text-red-600">
-                    {{ $user->total_terlambat }} kali
-                </span>
-            </div>
-        @endforeach
-    </div>
-
-</div>
 <div class="bg-white p-5 rounded-xl shadow mt-6">
 
 <h3 class="font-semibold mb-4 text-blue-600">
@@ -190,7 +141,7 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
         {{-- Office Rajin --}}
         <div class="bg-white p-4 rounded-xl shadow">
             <h3 class="font-semibold mb-3 text-green-600 text-sm lg:text-base">
-                🏆 Office Rajin
+                🏆 Office Paling Rajin
             </h3>
 
             @foreach($rankingOffice as $index => $user)
@@ -225,17 +176,36 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
         {{-- Office Terlambat --}}
         <div class="bg-white p-4 rounded-xl shadow">
             <h3 class="font-semibold mb-3 text-red-600 text-sm lg:text-base">
-                ⚠ Office Terlambat
+                ⚠ Office Paling Telat
             </h3>
 
             @foreach($rankingOfficeLate as $index => $item)
-                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
-                    <span>#{{ $index+1 }} {{ $item['user']->name }}</span>
-                    <span class="text-red-600 font-semibold">
-                            {{ $item['days'] }}h |
-                            {{ round(($item['hours'] + ($item['minutes'] / 60)),1) }}j
-                    </span>
-                </div>
+
+            @php
+            $border = '';
+            if($index == 0) $border = 'border-l-4 border-red-500 bg-red-50';
+            elseif($index == 1) $border = 'border-l-4 border-yellow-500 bg-yellow-50';
+            elseif($index == 2) $border = 'border-l-4 border-orange-500 bg-orange-50';
+            @endphp
+
+            <div class="flex justify-between py-2 px-2 mb-1 rounded text-xs lg:text-sm {{ $border }}">
+
+                <span>
+                    @if($index == 0) 🚨
+                    @elseif($index == 1) ⏰
+                    @elseif($index == 2) ⚠
+                    @endif
+
+                    #{{ $index+1 }} {{ $item['user']->name }}
+                </span>
+
+                <span class="text-red-600 font-semibold">
+                    {{ $item['days'] }}h |
+                    {{ round(($item['hours'] + ($item['minutes'] / 60)),1) }}j
+                </span>
+
+            </div>
+
             @endforeach
         </div>
 
@@ -248,7 +218,7 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
         {{-- Sales Rajin --}}
         <div class="bg-white p-4 rounded-xl shadow">
             <h3 class="font-semibold mb-3 text-blue-600 text-sm lg:text-base">
-                🏆 Sales Rajin
+                🏆 Sales Paling Rajin
             </h3>
 
             @foreach($rankingSales as $index => $user)
@@ -280,17 +250,36 @@ class="bg-purple-600 text-white px-4 py-2 rounded text-center">
         {{-- Sales Terlambat --}}
         <div class="bg-white p-4 rounded-xl shadow">
             <h3 class="font-semibold mb-3 text-red-600 text-sm lg:text-base">
-                ⚠ Sales Terlambat
+                ⚠ Sales Paling Telat
             </h3>
 
             @foreach($rankingSalesLate as $index => $item)
-                <div class="flex justify-between border-b py-1 text-xs lg:text-sm">
-                    <span>#{{ $index+1 }} {{ $item['user']->name }}</span>
-                    <span class="text-red-600 font-semibold">
-                            {{ $item['days'] }}h |
-                            {{ round(($item['hours'] + ($item['minutes'] / 60)),1) }}j
-                    </span>
-                </div>
+
+            @php
+            $border = '';
+            if($index == 0) $border = 'border-l-4 border-red-500 bg-red-50';
+            elseif($index == 1) $border = 'border-l-4 border-yellow-500 bg-yellow-50';
+            elseif($index == 2) $border = 'border-l-4 border-orange-500 bg-orange-50';
+            @endphp
+
+            <div class="flex justify-between py-2 px-2 mb-1 rounded text-xs lg:text-sm {{ $border }}">
+
+                <span>
+                    @if($index == 0) 🚨
+                    @elseif($index == 1) ⏰
+                    @elseif($index == 2) ⚠
+                    @endif
+
+                    #{{ $index+1 }} {{ $item['user']->name }}
+                </span>
+
+                <span class="text-red-600 font-semibold">
+                    {{ $item['days'] }}h |
+                    {{ round(($item['hours'] + ($item['minutes'] / 60)),1) }}j
+                </span>
+
+            </div>
+
             @endforeach
         </div>
 
