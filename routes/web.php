@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\AnnouncementController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Attendance;
 use App\Exports\AttendanceExport;
@@ -87,7 +88,9 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth','admin']) ->group(function () {
+
+    Route::resource('/admin/announcements', AnnouncementController::class);
 
     Route::get('/admin/dashboard', [AdminController::class,'dashboard'])
     ->name('admin.dashboard');
